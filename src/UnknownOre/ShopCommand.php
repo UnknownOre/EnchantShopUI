@@ -17,7 +17,7 @@ class ShopCommand extends PluginCommand {
         if ($sender instanceof Player) {
             $this->plugin->ListForm($sender);
         }else{
-            $sender->sendMessage(TF::RED . "Please use this in-game.");
+            $sender->sendMessage("Please use this in-game.");
         }
 		return true;
 	}
