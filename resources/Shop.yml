@@ -1,0 +1,14 @@
+---
+#- - Enchantment name
+#  - Enchantment ID
+#  - Price
+#  - Max Level
+- - Protection
+  - 0
+  - 100
+  - 4
+- - Fire Protection
+  - 1
+  - 1
+  - 3
+...
