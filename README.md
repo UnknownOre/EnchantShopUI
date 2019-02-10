@@ -1,4 +1,4 @@
-## ShopUI
+## EnchantShopUI
 
 a simple enchantment shop 
 
