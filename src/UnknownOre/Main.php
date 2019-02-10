@@ -64,7 +64,7 @@ class Main extends PB {
         }
         );
         $form->setTitle("§eBuy enchantment");
-        $form->addLabel("§aEnchantment:§c ".$name."\n§aYou will pay §e".$price."$§a per level");
+        $form->addLabel("§aEnchantment:§c ".$name."\n§aYou will pay §e".$price."$ §aper level");
         $form->addSlider("Level", 1, $level, 1, -1);
         $form->sendToPlayer($player);
     }
