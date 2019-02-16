@@ -1,9 +1,9 @@
 name: EnchantUI
-main: UnknownOre\Main
-version: 0.1
+main: UnknownOre\EnchantUI\Main
+version: 0.2
 api: [3.0.0]
 author: UnknownOre
 
 commands:
  enchantui:
-  description: "buy enchantments"
+  description: "Buy enchantments"
