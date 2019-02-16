@@ -1,6 +1,6 @@
 <?php
 
-namespace UnknownOre;
+namespace UnknownOre\EnchantUI;
 
 use pocketmine\{Server ,Player};
 use pocketmine\item\{Item , enchantment\Enchantment , enchantment\EnchantmentInstance};
