@@ -1,5 +1,5 @@
 <?php
-namespace UnknownOre;
+namespace UnknownOre\EnchantUI;
 
 use pocketmine\command\{ Command, PluginCommand, CommandSender};
 use pocketmine\Player;
