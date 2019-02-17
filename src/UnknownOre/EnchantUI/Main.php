@@ -24,6 +24,7 @@ class Main extends PB {
         $this->shop = new Config($this->getDataFolder() . "Shop.yml", Config::YAML);
         $this->fapi = Server::getInstance()->getPluginManager()->getPlugin("FormAPI");
     }
+	
     public function ListForm(Player $player): void{
         $form = $this->fapi->createSimpleForm(function (Player $player, $data = null){
             if ($data === null){
@@ -40,6 +41,7 @@ class Main extends PB {
         $form->setTitle(C::RED."Enchantment Shop");
         $form->sendToPlayer($player);
     }
+	
     public function BuyForm(Player $player, $id): void{
         $array = $this->shop->getAll();
         $price = $array[$id][2];
@@ -74,4 +76,5 @@ class Main extends PB {
         $form->addSlider("Level", 1, $level, 1, -1);
         $form->sendToPlayer($player);
     }
+	
 }
