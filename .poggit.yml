@@ -4,4 +4,5 @@ branches:
 projects:
   EnchantShopUI:
     path: ""
+    icon: "/logo.png"
 ...
