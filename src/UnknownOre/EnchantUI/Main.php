@@ -52,21 +52,18 @@ class Main extends PB {
         $form = new CustomForm(function (Player $player, $data = null) use ($price, $ide, $name){
             $money = EconomyAPI::getInstance()->myMoney($player);
             $fprice = $price * $data[1];
-            $swordids = array(267, 268, 272, 276, 283);
             if ($data === null){
                 $this->ListForm($player);
-            }elseif(in_array($player->getInventory()->getItemInHand()->getId(), $swordids)) {
-                if($money > $fprice){
-                    EconomyAPI::getInstance()->reduceMoney($player,  $price * $data[1]);
-                    $item = $player->getInventory()->getItemInHand();
-                    $ench = Enchantment::getEnchantment($ide);
-                    $item->addEnchantment(new EnchantmentInstance($ench, (int) $data[1]));
-                    $player->getInventory()->setItemInHand($item);
-                    $message = C::GREEN."You have bought ". $name. " level ". $data[1]. " For ".C::YELLOW. $fprice.C::RED. "$";
-                    $player->sendMessage($message);
-                }else{
-                    $player->sendMessage(C::RED.' You dont have enough Money!');
-                }
+            }elseif($money > $fprice){
+                EconomyAPI::getInstance()->reduceMoney($player,  $price * $data[1]);
+                $item = $player->getInventory()->getItemInHand();
+                $ench = Enchantment::getEnchantment($ide);
+                $item->addEnchantment(new EnchantmentInstance($ench, (int) $data[1]));
+                $player->getInventory()->setItemInHand($item);
+                $message = C::GREEN."You have bought ". $name. " level ". $data[1]. " For ".C::YELLOW. $fprice.C::RED. "$";
+                $player->sendMessage($message);
+            }else{
+                $player->sendMessage(C::RED.' You dont have enough Money!');
             }
         }
         );
