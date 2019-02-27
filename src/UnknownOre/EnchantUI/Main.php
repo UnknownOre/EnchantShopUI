@@ -40,7 +40,7 @@ class Main extends PB {
 			$form->addButton(C::DARK_AQUA.$content[0]." ".C::GREEN.$content[2]."$");
 		}
         $form->setTitle(C::RED."Enchantment Shop");
-        $form->sendToPlayer($player);
+        $player->sendForm($form);
     }
 	
     public function BuyForm(Player $player, $id): void{
@@ -73,7 +73,7 @@ class Main extends PB {
         $form->addLabel(C::DARK_AQUA.'You will pay '.C::YELLOW. $price.'$'.C::DARK_AQUA.' per level');
         $form->setTitle(C::RED."Enchantment Shop");
         $form->addSlider("Level", 1, $level, 1, -1);
-        $form->sendToPlayer($player);
+        $player->sendForm($form);
     }
 	
 }
