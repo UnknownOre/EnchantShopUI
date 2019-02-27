@@ -9,7 +9,9 @@ use pocketmine\utils\Config;
 use pocketmine\plugin\PluginBase as PB;
 
 use onebone\economyapi\EconomyAPI;
-use joe777777\FormAPI;
+use jojoe77777\FormAPI\CustomForm;
+use jojoe77777\FormAPI\ModalForm;
+use jojoe77777\FormAPI\SimpleForm;
 use pocketmine\utils\TextFormat as C;
 
 class Main extends PB {
@@ -22,11 +24,10 @@ class Main extends PB {
         $this->saveDefaultConfig();
         $this->getServer()->getCommandMap()->register("enchantui", new ShopCommand($this));
         $this->shop = new Config($this->getDataFolder() . "Shop.yml", Config::YAML);
-        $this->fapi = Server::getInstance()->getPluginManager()->getPlugin("FormAPI");
     }
 	
     public function ListForm(Player $player): void{
-        $form = $this->fapi->createSimpleForm(function (Player $player, $data = null){
+        $form = new SimpleForm(function (Player $player, $data = null){
             if ($data === null){
                 $player->sendMessage(C::GREEN.'Thank You for using Enchant Shop');
             }else{
@@ -48,7 +49,7 @@ class Main extends PB {
         $ide = $array[$id][1];
         $level = $array[$id][3];
         $name = $array[$id][0];
-        $form = $this->fapi->createCustomForm(function (Player $player, $data = null) use ($price, $ide, $name){
+        $form = new CustomForm(function (Player $player, $data = null) use ($price, $ide, $name){
             $money = EconomyAPI::getInstance()->myMoney($player);
             $fprice = $price * $data[1];
             $swordids = array(267, 268, 272, 276, 283);
@@ -66,8 +67,6 @@ class Main extends PB {
                 }else{
                     $player->sendMessage(C::RED.' You dont have enough Money!');
                 }
-            }else{
-                $player->sendMessage(C::RED.'Hold a Sword!');
             }
         }
         );
