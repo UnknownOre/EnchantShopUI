@@ -10,7 +10,6 @@ a simple enchantment shop
 ## Important
 
 - Requires EconomyAPI by ONEBONE
-- requires FormAPI by joe777777
 
 ## Devs/Info
 
