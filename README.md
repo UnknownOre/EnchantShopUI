@@ -1,17 +1,11 @@
 ## EnchantShopUI [![](https://poggit.pmmp.io/shield.state/EnchantUI)](https://poggit.pmmp.io/p/EnchantUI)
 
-a simple enchantment shop 
-
-## Features
-
--  unlimited Enchantments
--  Please Make suggestions!
+a basic enchantment shop 
 
 ## Important
 
 - Requires EconomyAPI by ONEBONE
 
 ## Devs/Info
-
 - Made by: UnknownOre
 
