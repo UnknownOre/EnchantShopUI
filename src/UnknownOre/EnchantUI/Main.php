@@ -53,7 +53,7 @@ class Main extends PluginBase{
         $player->sendForm($form);
     }
     
-	/**
+   /**
     * @param Player $player
     * @param int $id
     */
