@@ -30,8 +30,8 @@ class Main extends PluginBase{
         $this->getServer()->getCommandMap()->register("enchantui", new Commands\ShopCommand($this));
         $this->shop = new Config($this->getDataFolder() . "Shop.yml", Config::YAML);
     }
-    
-	/**
+	
+    /**
     * @param Player $player
     */
     public function listForm(Player $player): void{
