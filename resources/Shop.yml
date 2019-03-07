@@ -1,15 +1,12 @@
 ---
-# only enchant swords for the moment
-#- - Enchantment name
-#  - Enchantment ID
-#  - Price
-#  - Max Level
-- - Protection
-  - 0
-  - 100
-  - 4
-- - Fire Protection
-  - 1
-  - 1
-  - 3
+shop:
+- name: Fire Protection
+  id: 3
+  price: 1
+  max-level: 3
+- name: Fire2 Protection
+  id: 3
+  price: 1
+  max-level: 5
 ...
+
