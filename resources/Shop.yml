@@ -1,15 +1,24 @@
 ---
-# only enchant swords for the moment
-#- - Enchantment name
-#  - Enchantment ID
-#  - Price
-#  - Max Level
-- - Protection
-  - 0
-  - 100
-  - 4
-- - Fire Protection
-  - 1
-  - 1
-  - 3
+#Dont Change this
+version: "0.4"
+#EnchantUI Version 0.4
+Title: "§cEnchantment Shop"
+Button: "§3{NAME} §a{PRICE}$"
+slider-title: "§5Level"
+messages:
+  thanks: "§athank you for using Enchantment Shop"
+  label: "§eYou will pay {PRICE}$ per level"
+  not-enough-money: "§cyou don't have enough money!"
+  paid-success: "§aYou bought {NAME} level {LEVEL} for {PRICE}$"
+  hold-item: "§cPlease hold an item that can be enchanted"
+  no-perm: "§cYou don't have permission to use this command"
+shop:
+- name: Fire Protection
+  enchantment: fire_protection
+  price: 100
+  max-level: 2
+- name: Protection
+  enchantment: 1
+  price: 100
+  max-level: 3
 ...

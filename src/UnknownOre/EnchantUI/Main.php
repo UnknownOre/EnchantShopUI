@@ -2,75 +2,134 @@
 
 namespace UnknownOre\EnchantUI;
 
-use pocketmine\{Server ,Player};
-use pocketmine\item\{Item , enchantment\Enchantment , enchantment\EnchantmentInstance};
-
+use pocketmine\{
+    Server,
+    Player
+};
+use pocketmine\item\{
+    Item,
+    Tool,
+    Armor,
+    enchantment\Enchantment,
+    enchantment\EnchantmentInstance
+};
 use pocketmine\utils\Config;
-use pocketmine\plugin\PluginBase as PB;
-
+use UnknownOre\EnchantUI\libs\jojoe77777\FormAPI\{
+    CustomForm,
+    SimpleForm
+};
+use pocketmine\plugin\PluginBase;
 use onebone\economyapi\EconomyAPI;
-use jojoe77777\FormAPI\CustomForm;
-use jojoe77777\FormAPI\ModalForm;
-use jojoe77777\FormAPI\SimpleForm;
-use pocketmine\utils\TextFormat as C;
+use DaPigGuy\PiggyCustomEnchants\CustomEnchants\CustomEnchants;
 
-class Main extends PB {
+class Main extends PluginBase{
+    
     public function onEnable(): void{
-        $this->getLogger()->info("EnchantShop has been enabled!");
-        if(!file_exists($this->getDataFolder() . "Shop.yml")) {
-            @mkdir($this->getDataFolder());
+        @mkdir($this->getDataFolder());
+        $this->getLogger()->notice("EnchantShopUI has been enabled.");
+        $this->shop = new Config($this->getDataFolder() . "Shop.yml", Config::YAML);
+        if(is_null($this->shop->getNested('version'))){
             file_put_contents($this->getDataFolder() . "Shop.yml",$this->getResource("Shop.yml"));
+            $this->getLogger()->notice("Updating Plugin Config.....");
         }
         $this->saveDefaultConfig();
-        $this->getServer()->getCommandMap()->register("enchantui", new ShopCommand($this));
-        $this->shop = new Config($this->getDataFolder() . "Shop.yml", Config::YAML);
+        $this->getServer()->getCommandMap()->register("enchantui", new Commands\ShopCommand($this));
+        $this->piggyCE = $this->getServer()->getPluginManager()->getPlugin("PiggyCustomEnchants");
     }
-	
-    public function ListForm(Player $player): void{
+    
+	/**
+    * @param Player $player
+    */
+    public function listForm(Player $player): void{
         $form = new SimpleForm(function (Player $player, $data = null){
             if ($data === null){
-                $player->sendMessage(C::GREEN.'Thank You for using Enchant Shop');
-            }else{
-                $this->BuyForm($player, $data);
+                $player->sendMessage($this->shop->getNested('messages.thanks'));
+                return;
             }
+            $this->buyForm($player, $data);
         });
-        $array = $this->shop->getAll();
-		foreach ($array as $name => $content) {
-
-			$form->addButton(C::DARK_AQUA.$content[0]." ".C::GREEN.$content[2]."$");
+		foreach ($this->shop->getNested('shop') as $name){
+            $var = array(
+            "NAME" => $name['name'],
+            "PRICE" => $name['price']
+            );
+			$form->addButton($this->replace($this->shop->getNested('Button'), $var));
 		}
-        $form->setTitle(C::RED."Enchantment Shop");
+        $form->setTitle($this->shop->getNested('Title'));
         $player->sendForm($form);
     }
-	
-    public function BuyForm(Player $player, $id): void{
-        $array = $this->shop->getAll();
-        $price = $array[$id][2];
-        $ide = $array[$id][1];
-        $level = $array[$id][3];
-        $name = $array[$id][0];
-        $form = new CustomForm(function (Player $player, $data = null) use ($price, $ide, $name){
-            $money = EconomyAPI::getInstance()->myMoney($player);
-            $fprice = $price * $data[1];
+    
+	/**
+    * @param Player $player
+    * @param int $id
+    */
+    public function buyForm(Player $player,int $id): void{
+        $array = $this->shop->getNested('shop');
+        $form = new CustomForm(function (Player $player, $data = null) use ($array, $id){
+            $var = array(
+            "NAME" => $array[$id]['name'],
+            "PRICE" => $array[$id]['price'] * $data[1],
+            "LEVEL" => $data[1],
+            "MONEY" => EconomyAPI::getInstance()->myMoney($player)
+            );
             if ($data === null){
-                $this->ListForm($player);
-            }elseif($money > $fprice){
-                EconomyAPI::getInstance()->reduceMoney($player,  $price * $data[1]);
-                $item = $player->getInventory()->getItemInHand();
-                $ench = Enchantment::getEnchantment($ide);
-                $item->addEnchantment(new EnchantmentInstance($ench, (int) $data[1]));
-                $player->getInventory()->setItemInHand($item);
-                $message = C::GREEN."You have bought ". $name. " level ". $data[1]. " For ".C::YELLOW. $fprice.C::RED. "$";
-                $player->sendMessage($message);
+                $this->listForm($player);
+                return;
+            }
+            if(!$player->getInventory()->getItemInHand() instanceof Tool and !$player->getInventory()->getItemInHand() instanceof Armor){
+                $player->sendMessage($this->shop->getNested('messages.hold-item'));
+                return;
+            }
+            if(EconomyAPI::getInstance()->myMoney($player) > $c = $array[$id]['price'] * $data[1]){
+                EconomyAPI::getInstance()->reduceMoney($player, $c);
+                $this->enchantItem($player, $data[1], $array[$id]['enchantment']); 
+                $player->sendMessage($this->replace($this->shop->getNested('messages.paid-success'), $var));
             }else{
-                $player->sendMessage(C::RED.' You dont have enough Money!');
+                $player->sendMessage($this->replace($this->shop->getNested('messages.not-enough-money'), $var));
             }
         }
         );
-        $form->addLabel(C::DARK_AQUA.'You will pay '.C::YELLOW. $price.'$'.C::DARK_AQUA.' per level');
-        $form->setTitle(C::RED."Enchantment Shop");
-        $form->addSlider("Level", 1, $level, 1, -1);
+        $form->addLabel($this->replace($this->shop->getNested('messages.label'),["PRICE" => $array[$id]['price']]));
+        $form->setTitle($this->shop->getNested('Title'));
+        $form->addSlider($this->shop->getNested('slider-title'), 1, $array[$id]['max-level'], 1, -1);
         $player->sendForm($form);
     }
-	
+    
+    /**
+    * @param Player $Item
+    * @param int $level
+    * @param int|String $enchantment
+    */
+	public function enchantItem(Player $player, int $level, $enchantment): void{
+        $item = $player->getInventory()->getItemInHand();
+        if(is_string($enchantment)){
+            $ench = Enchantment::getEnchantmentByName((string) $enchantment);
+            if($this->piggyCE !== null && $ench === null){
+                $ench = CustomEnchants::getEnchantmentByName((string) $enchantment);
+            }
+            if($this->piggyCE !== null && $ench instanceof CustomEnchants){
+                $this->piggyCE->addEnchantment($item, $ench->getName(), (int) $level);
+            }else{
+                $item->addEnchantment(new EnchantmentInstance($ench, (int) $level));
+            }
+        }
+        if(is_int($enchantment)){
+            $ench = Enchantment::getEnchantment($enchantment);
+            $item->addEnchantment(new EnchantmentInstance($ench, (int) $level));
+        }
+        $player->getInventory()->setItemInHand($item);
+    }
+    
+    /**
+    * @param string $message
+    * @param array $keys
+    *
+    * @return string
+    */
+    public function replace($message, array $keys){
+        foreach($keys as $word => $value){
+            $message = str_replace("{".$word."}", $value, $message);
+        }
+        return $message;
+    }
 }
