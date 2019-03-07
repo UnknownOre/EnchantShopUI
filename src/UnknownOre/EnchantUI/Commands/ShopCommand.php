@@ -42,5 +42,5 @@ class ShopCommand extends PluginCommand {
         $this->plugin->listForm($sender);
         return true;
 	}
-    
+   
 }
