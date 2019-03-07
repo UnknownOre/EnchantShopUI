@@ -18,6 +18,7 @@ use UnknownOre\EnchantUI\libs\jojoe77777\FormAPI\{
 };
 use pocketmine\plugin\PluginBase;
 use onebone\economyapi\EconomyAPI;
+use DaPigGuy\PiggyCustomEnchants\CustomEnchants\CustomEnchants;
 
 class Main extends PluginBase{
     
@@ -29,6 +30,7 @@ class Main extends PluginBase{
         $this->saveDefaultConfig();
         $this->getServer()->getCommandMap()->register("enchantui", new Commands\ShopCommand($this));
         $this->shop = new Config($this->getDataFolder() . "Shop.yml", Config::YAML);
+        $this->piggyCE = $this->getServer()->getPluginManager()->getPlugin("PiggyCustomEnchants");
     }
 	
     /**
@@ -52,8 +54,8 @@ class Main extends PluginBase{
         $form->setTitle($this->shop->getNested('Title'));
         $player->sendForm($form);
     }
-    
-   /**
+	
+    /**
     * @param Player $player
     * @param int $id
     */
@@ -72,9 +74,7 @@ class Main extends PluginBase{
             }
             if(EconomyAPI::getInstance()->myMoney($player) > $c = $array[$id]['price'] * $data[1]){
                 EconomyAPI::getInstance()->reduceMoney($player, $c);
-                $item = $player->getInventory()->getItemInHand();
-                $item->addEnchantment(new EnchantmentInstance(Enchantment::getEnchantment($array[$id]['id']), (int) $data[1]));
-                $player->getInventory()->setItemInHand($item);
+                $this->enchantItem($array[$id]['enchantment'], $player,$data[1]); 
                 $player->sendMessage($this->replace($this->shop->getNested('messages.paid-success'), $var));
             }else{
                 $player->sendMessage($this->replace($this->shop->getNested('messages.not-enough-money'), $var));
@@ -86,7 +86,29 @@ class Main extends PluginBase{
         $form->addSlider($this->shop->getNested('slider-title'), 1, $array[$id]['max-level'], 1, -1);
         $player->sendForm($form);
     }
-	
+    /**
+    * @param string|int $enchantment
+    * @param Player $Item
+    */
+	public function enchantItem($enchantment ,Player $player,int $level): void{
+        $item = $player->getInventory()->getItemInHand();
+        if(is_string($enchantment)){
+            $ench = Enchantment::getEnchantmentByName((string) $enchantment);
+            if($ench === null){
+                $ench = CustomEnchants::getEnchantmentByName((string) $enchantment);
+            }
+            if($this->piggyCE !== null && $ench instanceof CustomEnchants){
+                $this->piggyCE->addEnchantment($item, $ench->getName(), (int) $level);
+            }else{
+                $item->addEnchantment(new EnchantmentInstance($ench, (int) $level));
+            }
+        }
+        if(is_int($enchantment)){
+            $ench = Enchantment::getEnchantment($enchantment);
+            $item->addEnchantment(new EnchantmentInstance($ench, (int) $level));
+        }
+        $player->getInventory()->setItemInHand($item);
+    }
     /**
     * @param string $message
     * @param array $keys
