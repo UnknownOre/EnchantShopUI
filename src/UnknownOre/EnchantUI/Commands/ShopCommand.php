@@ -6,11 +6,6 @@ use pocketmine\command\{
     PluginCommand,
     CommandSender
 };
-use pocketmine\item\{
-    Item,
-    Tool,
-    Armor
-};
 use pocketmine\Player;
 use UnknownOre\EnchantUI\Main;
 
@@ -37,15 +32,11 @@ class ShopCommand extends PluginCommand {
     */
     public function execute(CommandSender $sender, string $commandLabel, array $args): bool {
         if(!$sender->hasPermission("eshop.command")){
-            $sender->sendMessage($this->plugin->shop->getNested('no-perm'));
+            $sender->sendMessage($this->plugin->shop->getNested('messages.no-perm'));
             return false;
         }
         if(!$sender instanceof Player){
             $sender->sendMessage("Please use this in-game.");
-            return false;
-        }
-        if(!$sender->getInventory()->getItemInHand() instanceof Tool and !$sender->getInventory()->getItemInHand() instanceof Armor){
-            $sender->sendMessage($this->plugin->shop->getNested('messages.hold-item'));
             return false;
         }   
         $this->plugin->listForm($sender);
