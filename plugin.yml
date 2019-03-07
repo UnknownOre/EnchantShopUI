@@ -1,9 +1,10 @@
 name: EnchantUI
 main: UnknownOre\EnchantUI\Main
-version: 0.3
-api: [3.0.0]
+version: 0.4
+api: 3.0.0
+load: POSTWORLD
 author: UnknownOre
-
-commands:
- enchantui:
-  description: "Buy enchantments"
+permissions:
+  eshop.command:
+    default: true
+    description: "use all EnchantUI Commands"
