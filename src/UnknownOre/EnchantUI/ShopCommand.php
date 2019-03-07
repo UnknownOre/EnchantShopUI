@@ -28,7 +28,7 @@ class ShopCommand extends PluginCommand {
         $this->plugin = $plugin;
     }
     
-	/**
+   /**
     * @param CommandSender $sender
     * @param string $commandLabel
     * @param array $args
