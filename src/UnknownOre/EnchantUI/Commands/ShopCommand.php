@@ -37,7 +37,7 @@ class ShopCommand extends PluginCommand {
     */
     public function execute(CommandSender $sender, string $commandLabel, array $args): bool {
         if(!$sender->hasPermission("eshop.command")){
-            $sender->sendMessage($this->plugin->shop->getNested('messages.hold-item'));
+            $sender->sendMessage($this->plugin->shop->getNested('no-perm'));
             return false;
         }
         if(!$sender instanceof Player){
