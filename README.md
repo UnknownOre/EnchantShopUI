@@ -1,6 +1,6 @@
 ## EnchantShopUI [![](https://poggit.pmmp.io/shield.state/EnchantUI)](https://poggit.pmmp.io/p/EnchantUI)
 
-a basic enchantment shop 
+a simple enchantment shop 
 
 ## Important
 
