@@ -33,11 +33,11 @@ class ShopCommand extends PluginCommand {
     public function execute(CommandSender $sender, string $commandLabel, array $args): bool {
         if(!$sender->hasPermission("eshop.command")){
             $sender->sendMessage($this->plugin->shop->getNested('messages.no-perm'));
-            return false;
+            return true;
         }
         if(!$sender instanceof Player){
             $sender->sendMessage("Please use this in-game.");
-            return false;
+            return true;
         }   
         $this->plugin->listForm($sender);
         return true;
