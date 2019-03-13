@@ -48,7 +48,7 @@ class Main extends PluginBase{
             }
             $this->buyForm($player, $data);
         });
-		foreach ($this->shop->getNested('shop') as $name){
+		foreach($this->shop->getNested('shop') as $name){
             $var = array(
             "NAME" => $name['name'],
             "PRICE" => $name['price']
