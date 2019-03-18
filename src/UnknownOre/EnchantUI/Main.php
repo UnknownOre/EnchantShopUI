@@ -37,7 +37,7 @@ class Main extends PluginBase{
         $this->piggyCE = $this->getServer()->getPluginManager()->getPlugin("PiggyCustomEnchants");
     }
     
-	/**
+   /**
     * @param Player $player
     */
     public function listForm(Player $player): void{
