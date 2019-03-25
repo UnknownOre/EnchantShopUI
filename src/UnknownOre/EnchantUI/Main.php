@@ -28,13 +28,30 @@ class Main extends PluginBase{
         @mkdir($this->getDataFolder());
         $this->getLogger()->notice("EnchantShopUI has been enabled.");
         $this->shop = new Config($this->getDataFolder() . "Shop.yml", Config::YAML);
-        if(is_null($this->shop->getNested('version'))){
-            file_put_contents($this->getDataFolder() . "Shop.yml",$this->getResource("Shop.yml"));
-            $this->getLogger()->notice("Updating Plugin Config.....");
-        }
+        $this->UpdateConfig();
         $this->saveDefaultConfig();
+        $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
         $this->getServer()->getCommandMap()->register("enchantui", new Commands\ShopCommand($this));
         $this->piggyCE = $this->getServer()->getPluginManager()->getPlugin("PiggyCustomEnchants");
+    }
+    
+    public function UpdateConfig(): void{
+        if(is_null($this->shop->getNested('version'))){
+            file_put_contents($this->getDataFolder() . "Shop.yml",$this->getResource("Shop.yml"));
+            $this->getLogger()->notice("Updating plugin config.....");
+            return;
+        }
+        if($this->shop->getNested('version') != '0.5'){
+            $shop = $this->shop->getNested('shop');
+            $this->getLogger()->notice("Updating plugin config to version 0.5");
+            foreach($shop as $list => $data){
+                $data["incompatible"] = [];
+                $shop[$list] = $data;
+            }
+            $this->shop->set('shop', $shop);
+            $this->shop->save();
+            return;
+        }
     }
     
    /**
@@ -70,7 +87,8 @@ class Main extends PluginBase{
             "NAME" => $array[$id]['name'],
             "PRICE" => $array[$id]['price'] * $data[1],
             "LEVEL" => $data[1],
-            "MONEY" => EconomyAPI::getInstance()->myMoney($player)
+            "MONEY" => EconomyAPI::getInstance()->myMoney($player),
+            "INCOMPATIBLE" => $incompatible = $this->isCompatible($player, $array[$id]['incompatible-enchantments'])
             );
             if ($data === null){
                 $this->listForm($player);
@@ -78,6 +96,10 @@ class Main extends PluginBase{
             }
             if(!$player->getInventory()->getItemInHand() instanceof Tool and !$player->getInventory()->getItemInHand() instanceof Armor){
                 $player->sendMessage($this->shop->getNested('messages.hold-item'));
+                return;
+            }
+            if(!is_null($incompatible)){
+                $player->sendMessage($this->replace($this->shop->getNested('messages.incompatible-enchantment'), $var));
                 return;
             }
             if(EconomyAPI::getInstance()->myMoney($player) > $c = $array[$id]['price'] * $data[1]){
@@ -95,7 +117,7 @@ class Main extends PluginBase{
         $player->sendForm($form);
     }
     
-    /**
+   /**
     * @param Player $Item
     * @param int $level
     * @param int|String $enchantment
@@ -121,12 +143,28 @@ class Main extends PluginBase{
     }
     
     /**
+    * @param Player $player
+    * @param array $array
+    *
+    * @return int|mixed|null
+    */
+    public function isCompatible(Player $player,array $array){
+        $item = $player->getInventory()->getItemInHand();
+        foreach($array as $enchantment){
+            if($item->hasEnchantment($enchantment)){
+                $id = $enchantment;
+                return $id;
+            }
+        }
+    }
+    
+   /**
     * @param string $message
     * @param array $keys
     *
     * @return string
     */
-    public function replace($message, array $keys){
+    public function replace($message, array $keys): string{
         foreach($keys as $word => $value){
             $message = str_replace("{".$word."}", $value, $message);
         }
