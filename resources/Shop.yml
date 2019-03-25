@@ -1,7 +1,7 @@
 ---
-#Dont Change this
-version: "0.4"
-#EnchantUI Version 0.4
+#Don't Change this
+version: "0.5"
+#send EnchantUI to the player when he interacts with the Enchantment-table
 Title: "§cEnchantment Shop"
 Button: "§3{NAME} §a{PRICE}$"
 slider-title: "§5Level"
@@ -12,13 +12,16 @@ messages:
   paid-success: "§aYou bought {NAME} level {LEVEL} for {PRICE}$"
   hold-item: "§cPlease hold an item that can be enchanted"
   no-perm: "§cYou don't have permission to use this command"
+  incompabtible-enchantment: ""
 shop:
-- name: Fire Protection
+- name: "Fire Protection"
   enchantment: fire_protection
   price: 100
   max-level: 2
-- name: Protection
+  incompatible-enchantments: []
+- name: "Protection"
   enchantment: 1
   price: 100
   max-level: 3
+  incompatible-enchantments: []
 ...
