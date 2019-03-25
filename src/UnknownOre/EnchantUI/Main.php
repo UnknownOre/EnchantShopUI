@@ -25,11 +25,16 @@ use DaPigGuy\PiggyCustomEnchants\CustomEnchants\CustomEnchants;
 class Main extends PluginBase{
     
     public function onEnable(): void{
+        if (is_null($this->getServer()->getPluginManager()->getPlugin("EconomyAPI"))) {
+            $this->getLogger()->error("in order to use EnchantUI you need to install EconomyAPI.");
+            $this->getServer()->getPluginManager()->disablePlugin($this);
+            return;
+        }
         @mkdir($this->getDataFolder());
-        $this->getLogger()->notice("EnchantShopUI has been enabled.");
         $this->shop = new Config($this->getDataFolder() . "Shop.yml", Config::YAML);
         $this->UpdateConfig();
         $this->saveDefaultConfig();
+        $this->getLogger()->notice("EnchantShopUI has been enabled.");
         $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
         $this->getServer()->getCommandMap()->register("enchantui", new Commands\ShopCommand($this));
         $this->piggyCE = $this->getServer()->getPluginManager()->getPlugin("PiggyCustomEnchants");
@@ -38,12 +43,12 @@ class Main extends PluginBase{
     public function UpdateConfig(): void{
         if(is_null($this->shop->getNested('version'))){
             file_put_contents($this->getDataFolder() . "Shop.yml",$this->getResource("Shop.yml"));
-            $this->getLogger()->notice("Updating Plugin Config.....");
+            $this->getLogger()->notice("Updating plugin config.....");
             return;
         }
         if($this->shop->getNested('version') != '0.5'){
             $shop = $this->shop->getNested('shop');
-            $this->getLogger()->notice("Updating Plugin Config to 0.5");
+            $this->getLogger()->notice("Updating plugin config to version 0.5");
             foreach($shop as $list => $data){
                 $data["incompatible"] = [];
                 $shop[$list] = $data;
@@ -99,7 +104,7 @@ class Main extends PluginBase{
                 return;
             }
             if(!is_null($incompatible)){
-                $player->sendMessage($this->replace($this->shop->getNested('messages.incompatible'), $var));
+                $player->sendMessage($this->replace($this->shop->getNested('messages.incompatible-enchantment'), $var));
                 return;
             }
             if(EconomyAPI::getInstance()->myMoney($player) > $c = $array[$id]['price'] * $data[1]){
