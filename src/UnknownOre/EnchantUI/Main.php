@@ -38,12 +38,12 @@ class Main extends PluginBase{
     public function UpdateConfig(): void{
         if(is_null($this->shop->getNested('version'))){
             file_put_contents($this->getDataFolder() . "Shop.yml",$this->getResource("Shop.yml"));
-            $this->getLogger()->notice("Updating plugin config.....");
+            $this->getLogger()->notice("Updating Plugin Config.....");
             return;
         }
         if($this->shop->getNested('version') != '0.5'){
             $shop = $this->shop->getNested('shop');
-            $this->getLogger()->notice("Updating plugin config to version 0.5");
+            $this->getLogger()->notice("Updating Plugin Config to 0.5");
             foreach($shop as $list => $data){
                 $data["incompatible"] = [];
                 $shop[$list] = $data;
@@ -99,7 +99,7 @@ class Main extends PluginBase{
                 return;
             }
             if(!is_null($incompatible)){
-                $player->sendMessage($this->replace($this->shop->getNested('messages.incompatible-enchantment'), $var));
+                $player->sendMessage($this->replace($this->shop->getNested('messages.incompatible'), $var));
                 return;
             }
             if(EconomyAPI::getInstance()->myMoney($player) > $c = $array[$id]['price'] * $data[1]){
