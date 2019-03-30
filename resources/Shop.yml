@@ -16,7 +16,7 @@ messages:
   paid-success: "§aYou bought {NAME} level {LEVEL} for {PRICE}$"
   hold-item: "§cPlease hold an item that can be enchanted"
   no-perm: "§cYou don't have permission to use this command"
-  incompatible-enchantment: ""
+  incompatible-enchantment:
   
 #WARNING: Use only Enchantment ID at incompatible-enchantments example [1,10,13]
 shop:
