@@ -3,7 +3,7 @@
 version: "0.5"
 
 #send EnchantUI to the player when he interacts with the Enchanting-table
-enchantment-table: true
+enchanting-table: true
 
 #EnchantUI version 0.5
 Title: "§cEnchantment Shop"
