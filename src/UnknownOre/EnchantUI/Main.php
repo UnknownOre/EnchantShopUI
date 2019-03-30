@@ -138,7 +138,7 @@ class Main extends PluginBase{
     * @param int $level
     * @param int|String $enchantment
     */
-	public function enchantItem(Player $player, int $level, $enchantment): void{
+    public function enchantItem(Player $player, int $level, $enchantment): void{
         $item = $player->getInventory()->getItemInHand();
         if(is_string($enchantment)){
             $ench = Enchantment::getEnchantmentByName((string) $enchantment);
