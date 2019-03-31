@@ -22,6 +22,10 @@ use pocketmine\plugin\PluginBase;
 use onebone\economyapi\EconomyAPI;
 use DaPigGuy\PiggyCustomEnchants\CustomEnchants\CustomEnchants;
 
+/**
+ * Class Main
+ * @package UnknownOre\EnchantUI
+ */
 class Main extends PluginBase{
     
     public function onEnable(): void{
@@ -34,7 +38,6 @@ class Main extends PluginBase{
         $this->shop = new Config($this->getDataFolder() . "Shop.yml", Config::YAML);
         $this->UpdateConfig();
         $this->saveDefaultConfig();
-        $this->getLogger()->notice("EnchantShopUI has been enabled.");
         $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
         $this->getServer()->getCommandMap()->register("enchantui", new Commands\ShopCommand($this));
         $this->piggyCE = $this->getServer()->getPluginManager()->getPlugin("PiggyCustomEnchants");
@@ -73,13 +76,13 @@ class Main extends PluginBase{
             }
             $this->buyForm($player, $data);
         });
-		foreach($this->shop->getNested('shop') as $name){
+        foreach($this->shop->getNested('shop') as $name){
             $var = array(
             "NAME" => $name['name'],
             "PRICE" => $name['price']
             );
-			$form->addButton($this->replace($this->shop->getNested('Button'), $var));
-		}
+            $form->addButton($this->replace($this->shop->getNested('Button'), $var));
+	   }
         $form->setTitle($this->shop->getNested('Title'));
         $player->sendForm($form);
     }
@@ -166,6 +169,7 @@ class Main extends PluginBase{
     */
     public function isCompatible(Player $player,array $array){
         $item = $player->getInventory()->getItemInHand();
+        //TODO: the ability to use strings
         foreach($array as $enchantment){
             if($item->hasEnchantment($enchantment)){
                 $id = $enchantment;
