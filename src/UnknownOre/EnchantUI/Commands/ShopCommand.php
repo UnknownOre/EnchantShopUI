@@ -1,6 +1,5 @@
 <?php
 namespace UnknownOre\EnchantUI\Commands;
-
 use pocketmine\command\{
     Command,
     PluginCommand,
@@ -9,13 +8,17 @@ use pocketmine\command\{
 use pocketmine\Player;
 use UnknownOre\EnchantUI\Main;
 
-class ShopCommand extends PluginCommand {
+/**
+ * Class ShopCommand
+ * @package UnknownOre\EnchantUI\Commands
+ */
+class ShopCommand extends PluginCommand{
     
     /**
-     * ShopCommand constructor.
-     * @param Main $plugin
-     */
-    public function __construct(Main $plugin) {
+    * ShopCommand constructor.
+    * @param Main $plugin
+    */
+    public function __construct(Main $plugin){
         parent::__construct('enchantui', $plugin);
         $this->setAliases(['eshop','es']);
         $this->setDescription('Main Enchant command');
@@ -30,7 +33,7 @@ class ShopCommand extends PluginCommand {
     *
     * @return bool
     */
-    public function execute(CommandSender $sender, string $commandLabel, array $args): bool {
+    public function execute(CommandSender $sender, string $commandLabel, array $args): bool{
         if(!$sender->hasPermission("eshop.command")){
             $sender->sendMessage($this->plugin->shop->getNested('messages.no-perm'));
             return true;
