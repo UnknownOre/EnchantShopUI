@@ -1,11 +1,16 @@
 <?php
 namespace UnknownOre\EnchantUI;
-
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\Listener;
 use pocketmine\Item;
 use pocketmine\block\EnchantingTable;
+
+/**
+ * Class EventListener
+ * @package UnknownOre\EnchantUI
+ */
 Class EventListener implements Listener{
+    
     /** @var EnchantUI */
     private $plugin;
     
