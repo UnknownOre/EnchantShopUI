@@ -46,6 +46,7 @@ class Main extends PluginBase{
     public function UpdateConfig(): void{
         if(is_null($this->shop->getNested('version'))){
             file_put_contents($this->getDataFolder() . "Shop.yml",$this->getResource("Shop.yml"));
+            $this->shop->reload();
             $this->getLogger()->notice("plugin config has been updated");
             return;
         }
@@ -60,6 +61,7 @@ class Main extends PluginBase{
             }
             $this->shop->setAll($shop);
             $this->shop->save();
+            $this->shop->reload();
             $this->getLogger()->notice("Plugin config has been updated");
             return;
         }
