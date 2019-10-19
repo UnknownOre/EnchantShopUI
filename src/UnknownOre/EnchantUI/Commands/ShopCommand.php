@@ -20,9 +20,9 @@ class ShopCommand extends PluginCommand{
     */
     public function __construct(Main $plugin){
         parent::__construct('enchantui', $plugin);
-        $this->setAliases(['eshop','es']);
+        $this->setAliases(['ceshop','ces']);
         $this->setDescription('Main Enchant command');
-        $this->setPermission("eshop.command");
+        $this->setPermission("ceshop.command");
         $this->plugin = $plugin;
     }
     
@@ -34,7 +34,7 @@ class ShopCommand extends PluginCommand{
     * @return bool
     */
     public function execute(CommandSender $sender, string $commandLabel, array $args): bool{
-        if(!$sender->hasPermission("eshop.command")){
+        if(!$sender->hasPermission("ceshop.command")){
             $sender->sendMessage($this->plugin->shop->getNested('messages.no-perm'));
             return true;
         }
