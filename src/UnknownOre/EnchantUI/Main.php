@@ -19,7 +19,7 @@ use UnknownOre\EnchantUI\libs\jojoe77777\FormAPI\{
     SimpleForm
 };
 use pocketmine\plugin\PluginBase;
-use onebone\economyapi\EconomyAPI;
+use TwistedAsylumMC\multieconomy\MultiEconomy;
 use DaPigGuy\PiggyCustomEnchants\CustomEnchants\CustomEnchants;
 
 /**
@@ -29,8 +29,8 @@ use DaPigGuy\PiggyCustomEnchants\CustomEnchants\CustomEnchants;
 class Main extends PluginBase{
     
     public function onEnable(): void{
-        if (is_null($this->getServer()->getPluginManager()->getPlugin("EconomyAPI"))) {
-            $this->getLogger()->error("in order to use EnchantUI you need to install EconomyAPI.");
+        if (is_null($this->getServer()->getPluginManager()->getPlugin("MultiEconomy"))) {
+            $this->getLogger()->error("in order to use EnchantUI you need to install MultiEconomy.");
             $this->getServer()->getPluginManager()->disablePlugin($this);
             return;
         }
@@ -115,8 +115,8 @@ class Main extends PluginBase{
                 $this->sendNote($player , $this->shop->getNested('messages.incompatible-enchantment'), $var);
                 return;
             }
-            if(EconomyAPI::getInstance()->myMoney($player) > $c = $array[$id]['price'] * $data[1]){
-                EconomyAPI::getInstance()->reduceMoney($player, $c);
+            if(MultiEconomy::getInstance()->getBalances($player) > $c = $array[$id]['price'] * $data[1]){
+                MultiEconomy::getInstance()->takeFromBalance($player, $amount);
                 $this->enchantItem($player, $data[1], $array[$id]['enchantment']); 
                 $this->sendNote($player ,$this->shop->getNested('messages.paid-success'), $var);
             }else{
