@@ -20,8 +20,8 @@ class ShopCommand extends PluginCommand{
     */
     public function __construct(Main $plugin){
         parent::__construct('enchantui', $plugin);
-        $this->setAliases(['eshop','es']);
-        $this->setDescription('Main Enchant command');
+        $this->setAliases(['ceshop','cs']);
+        $this->setDescription('§d§lMain enchant command');
         $this->setPermission("eshop.command");
         $this->plugin = $plugin;
     }
