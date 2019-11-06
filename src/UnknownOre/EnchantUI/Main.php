@@ -39,7 +39,7 @@ class Main extends PluginBase{
         $this->UpdateConfig();
         $this->saveDefaultConfig();
         $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
-        $this->getServer()->getCommandMap()->register("enchantui", new Commands\ShopCommand($this));
+        $this->getServer()->getCommandMap()->register("blackmarket", new Commands\ShopCommand($this));
         $this->piggyCE = $this->getServer()->getPluginManager()->getPlugin("PiggyCustomEnchants");
     }
     
