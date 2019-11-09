@@ -21,7 +21,7 @@ class ShopCommand extends PluginCommand{
     public function __construct(Main $plugin){
         parent::__construct('blackmarket', $plugin);
         $this->setAliases(['bm']);
-        $this->setDescription('Main Enchant command');
+        $this->setDescription('Blackmarket command');
         $this->setPermission("eshop.command");
         $this->plugin = $plugin;
     }
