@@ -7,4 +7,4 @@ author: UnknownOre
 permissions:
   eshop.command:
     default: true
-    description: "use all EnchantUI Commands"
+    description: "use all ceshop commands"
