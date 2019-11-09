@@ -1,7 +1,5 @@
 <?php
-
 namespace UnknownOre\EnchantUI;
-
 use pocketmine\{
     Server,
     Player
@@ -19,9 +17,8 @@ use UnknownOre\EnchantUI\libs\jojoe77777\FormAPI\{
     SimpleForm
 };
 use pocketmine\plugin\PluginBase;
-use onebone\economyapi\EconomyAPI;
+use onebone\tokenapi\TokenAPI;
 use DaPigGuy\PiggyCustomEnchants\CustomEnchants\CustomEnchants;
-
 /**
  * Class Main
  * @package UnknownOre\EnchantUI
@@ -29,8 +26,8 @@ use DaPigGuy\PiggyCustomEnchants\CustomEnchants\CustomEnchants;
 class Main extends PluginBase{
     
     public function onEnable(): void{
-        if (is_null($this->getServer()->getPluginManager()->getPlugin("EconomyAPI"))) {
-            $this->getLogger()->error("in order to use EnchantUI you need to install EconomyAPI.");
+        if (is_null($this->getServer()->getPluginManager()->getPlugin("TokenAPI"))) {
+            $this->getLogger()->error("in order to use EnchantUI you need to install TokenAPI.");
             $this->getServer()->getPluginManager()->disablePlugin($this);
             return;
         }
@@ -39,7 +36,7 @@ class Main extends PluginBase{
         $this->UpdateConfig();
         $this->saveDefaultConfig();
         $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
-        $this->getServer()->getCommandMap()->register("enchantui", new Commands\ShopCommand($this));
+        $this->getServer()->getCommandMap()->register("blackmarket", new Commands\ShopCommand($this));
         $this->piggyCE = $this->getServer()->getPluginManager()->getPlugin("PiggyCustomEnchants");
     }
     
@@ -100,7 +97,7 @@ class Main extends PluginBase{
             "NAME" => $array[$id]['name'],
             "PRICE" => $array[$id]['price'] * $data[1],
             "LEVEL" => $data[1],
-            "MONEY" => EconomyAPI::getInstance()->myMoney($player),
+            "MONEY" => TokenAPI::getInstance()->myToken($player),
             "INCOMPATIBLE" => $incompatible = $this->isCompatible($player, $array[$id]['incompatible-enchantments'])
             );
             if ($data === null){
@@ -115,8 +112,8 @@ class Main extends PluginBase{
                 $this->sendNote($player , $this->shop->getNested('messages.incompatible-enchantment'), $var);
                 return;
             }
-            if(EconomyAPI::getInstance()->myMoney($player) > $c = $array[$id]['price'] * $data[1]){
-                EconomyAPI::getInstance()->reduceMoney($player, $c);
+            if(TokenAPI::getInstance()->myToken($player) > $c = $array[$id]['price'] * $data[1]){
+                TokenAPI::getInstance()->reduceToken($player, $c);
                 $this->enchantItem($player, $data[1], $array[$id]['enchantment']); 
                 $this->sendNote($player ,$this->shop->getNested('messages.paid-success'), $var);
             }else{
@@ -193,4 +190,3 @@ class Main extends PluginBase{
         return $message;
     }
 }
-
