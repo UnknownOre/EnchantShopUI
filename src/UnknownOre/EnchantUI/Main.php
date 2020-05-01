@@ -27,7 +27,7 @@ use DaPigGuy\PiggyCustomEnchants\CustomEnchants\CustomEnchants;
  * @package UnknownOre\EnchantUI
  */
 class Main extends PluginBase{
-    
+
     public function onEnable(): void{
         if (is_null($this->getServer()->getPluginManager()->getPlugin("EconomyAPI"))) {
             $this->getLogger()->error("in order to use EnchantUI you need to install EconomyAPI.");
@@ -42,7 +42,7 @@ class Main extends PluginBase{
         $this->getServer()->getCommandMap()->register("enchantui", new Commands\ShopCommand($this));
         $this->piggyCE = $this->getServer()->getPluginManager()->getPlugin("PiggyCustomEnchants");
     }
-    
+
     public function UpdateConfig(): void{
         if(is_null($this->shop->getNested('version'))){
             file_put_contents($this->getDataFolder() . "Shop.yml",$this->getResource("Shop.yml"));
@@ -66,10 +66,10 @@ class Main extends PluginBase{
             return;
         }
     }
-    
+
     /**
-    * @param Player $player
-    */
+     * @param Player $player
+     */
     public function listForm(Player $player): void{
         $form = new SimpleForm(function (Player $player, $data = null){
             if ($data === null){
@@ -80,28 +80,28 @@ class Main extends PluginBase{
         });
         foreach($this->shop->getNested('shop') as $name){
             $var = array(
-            "NAME" => $name['name'],
-            "PRICE" => $name['price']
+                "NAME" => $name['name'],
+                "PRICE" => $name['price']
             );
             $form->addButton($this->replace($this->shop->getNested('Button'), $var));
-	   }
+        }
         $form->setTitle($this->shop->getNested('Title'));
         $player->sendForm($form);
     }
-    
+
     /**
-    * @param Player $player
-    * @param int $id
-    */
+     * @param Player $player
+     * @param int $id
+     */
     public function buyForm(Player $player,int $id): void{
         $array = $this->shop->getNested('shop');
         $form = new CustomForm(function (Player $player, $data = null) use ($array, $id){
             $var = array(
-            "NAME" => $array[$id]['name'],
-            "PRICE" => $array[$id]['price'] * $data[1],
-            "LEVEL" => $data[1],
-            "MONEY" => EconomyAPI::getInstance()->myMoney($player),
-            "INCOMPATIBLE" => $incompatible = $this->isCompatible($player, $array[$id]['incompatible-enchantments'])
+                "NAME" => $array[$id]['name'],
+                "PRICE" => $array[$id]['price'] * $data[1],
+                "LEVEL" => $data[1],
+                "MONEY" => EconomyAPI::getInstance()->myMoney($player),
+                "INCOMPATIBLE" => $incompatible = $this->isCompatible($player, $array[$id]['incompatible-enchantments'])
             );
             if ($data === null){
                 $this->listForm($player);
@@ -115,9 +115,12 @@ class Main extends PluginBase{
                 $this->sendNote($player , $this->shop->getNested('messages.incompatible-enchantment'), $var);
                 return;
             }
+            if($data[1] > $array[$id]['max-level'] or $data[1] < 1){
+                return;
+            }
             if(EconomyAPI::getInstance()->myMoney($player) > $c = $array[$id]['price'] * $data[1]){
                 EconomyAPI::getInstance()->reduceMoney($player, $c);
-                $this->enchantItem($player, $data[1], $array[$id]['enchantment']); 
+                $this->enchantItem($player, $data[1], $array[$id]['enchantment']);
                 $this->sendNote($player ,$this->shop->getNested('messages.paid-success'), $var);
             }else{
                 $this->sendNote($player , $this->shop->getNested('messages.not-enough-money'), $var);
@@ -129,20 +132,20 @@ class Main extends PluginBase{
         $form->addSlider($this->shop->getNested('slider-title'), 1, $array[$id]['max-level'], 1, -1);
         $player->sendForm($form);
     }
-    
+
     /**
-    * @param Player $player
-    * @param null|mixed|string $msg
-    */
+     * @param Player $player
+     * @param null|mixed|string $msg
+     */
     public function sendNote(Player $player, $msg, array $var = []): void{
         if(!is_null($msg)) $player->sendMessage($this->replace($msg, $var));
     }
-    
+
     /**
-    * @param Player $Item
-    * @param int $level
-    * @param int|String $enchantment
-    */
+     * @param Player $Item
+     * @param int $level
+     * @param int|String $enchantment
+     */
     public function enchantItem(Player $player, int $level, $enchantment): void{
         $item = $player->getInventory()->getItemInHand();
         if(is_string($enchantment)){
@@ -162,13 +165,13 @@ class Main extends PluginBase{
         }
         $player->getInventory()->setItemInHand($item);
     }
-    
+
     /**
-    * @param Player $player
-    * @param array $array
-    *
-    * @return int|mixed|null
-    */
+     * @param Player $player
+     * @param array $array
+     *
+     * @return int|mixed|null
+     */
     public function isCompatible(Player $player,array $array){
         $item = $player->getInventory()->getItemInHand();
         //TODO: the ability to use strings
@@ -179,13 +182,13 @@ class Main extends PluginBase{
             }
         }
     }
-    
+
     /**
-    * @param string $message
-    * @param array $keys
-    *
-    * @return string
-    */
+     * @param string $message
+     * @param array $keys
+     *
+     * @return string
+     */
     public function replace(string $message, array $keys): string{
         foreach($keys as $word => $value){
             $message = str_replace("{".$word."}", $value, $message);
