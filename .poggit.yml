@@ -6,6 +6,6 @@ projects:
     path: ""
     icon: "/logo.png"
     libs:
-    - src: dktapps/pmforms/pmforms
+    - src: dktapps-pm-pl/pmforms/pmforms
       version: ^1.0.0
 ...
