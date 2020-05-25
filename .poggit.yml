@@ -6,6 +6,6 @@ projects:
     path: ""
     icon: "/logo.png"
     libs:
-    - src: UnknownOre\EnchantUI\pmforms
+    - src: dktapps\pmforms\pmforms
       version: ^1.0.0
 ...
