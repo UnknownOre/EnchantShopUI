@@ -6,6 +6,6 @@ projects:
     path: ""
     icon: "/logo.png"
     libs:
-    - src: jojoe77777/FormAPI/libFormAPI
-      version: ^1.3
+    - src: UnknownOre\EnchantUI\pmforms
+      version: ^1.0.0
 ...
