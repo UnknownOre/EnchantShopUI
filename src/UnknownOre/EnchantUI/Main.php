@@ -86,6 +86,10 @@ class Main extends PluginBase{
             $form->addButton($this->replace($this->shop->getNested('Button'), $var));
         }
         $form->setTitle($this->shop->getNested('Title'));
+        $money = $this->getServer
+          ()->getPluginManager()->getPlugin
+          ("EconomyAPI")->myMoney($player);
+        $form->setContent("§a➵ §e Tiền của bạn:§b $momey §axu");
         $player->sendForm($form);
     }
 
