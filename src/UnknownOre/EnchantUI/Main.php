@@ -50,9 +50,9 @@ class Main extends PluginBase{
             $this->getLogger()->notice("plugin config has been updated");
             return;
         }
-        if($this->shop->getNested('version') != '0.5'){
+        if($this->shop->getNested('version') != '0.6'){
             $shop = $this->shop->getAll();
-            $shop['version'] = '0.5';
+            $shop['version'] = '0.6';
             $shop['enchanting-table'] = true;
             $shop['messages']['incompatible-enchantment'] = '';
             foreach($shop['shop'] as $list => $data){
