@@ -1,11 +1,11 @@
 ---
 #Don't Change this
-version: "0.5"
+version: "0.6"
 
 #send EnchantUI to the player when he interacts with the Enchanting-table
 enchanting-table: true
 
-#EnchantUI version 0.5
+#EnchantUI version 0.6
 Title: "§cEnchantment Shop"
 Button: "§3{NAME} §a{PRICE}$"
 slider-title: "§5Level"
