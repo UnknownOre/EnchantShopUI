@@ -25,6 +25,8 @@ use DaPigGuy\PiggyCustomEnchants\enchants\CustomEnchant;
 use pocketmine\data\bedrock\EnchantmentIdMap;
 
 class Main extends PluginBase{
+    
+    public $shop;
 
     public function onEnable(): void{
         if (is_null($this->getServer()->getPluginManager()->getPlugin("BedrockEconomy"))) {
