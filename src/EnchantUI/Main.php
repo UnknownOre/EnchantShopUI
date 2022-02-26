@@ -27,6 +27,8 @@ use pocketmine\data\bedrock\EnchantmentIdMap;
 class Main extends PluginBase{
     
     public $shop;
+    
+    public $piggyCE;
 
     public function onEnable(): void{
         if (is_null($this->getServer()->getPluginManager()->getPlugin("BedrockEconomy"))) {
