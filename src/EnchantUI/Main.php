@@ -143,11 +143,6 @@ class Main extends PluginBase{
         if(!is_null($msg)) $player->sendMessage($this->replace($msg, $var));
     }
 
-    /**
-     * @param Player $Item
-     * @param int $level
-     * @param int|String $enchantment
-     */
     public function enchantItem(Player $player, int $level, $enchantment): void{
         $item = $player->getInventory()->getItemInHand();
         if(is_string($enchantment)){
