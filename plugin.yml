@@ -1,6 +1,6 @@
 name: EnchantUI
 main: EnchantUI\Main
-version: 0.6
+version: 0.7
 api: 4.0.0
 load: POSTWORLD
 author: 
