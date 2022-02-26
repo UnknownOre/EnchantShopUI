@@ -1,6 +1,6 @@
 <?php
 
-namespace EnchantUI\Commands;
+namespace EnchantShopUI\Commands;
 
 use pocketmine\command\{
     Command,
@@ -8,7 +8,7 @@ use pocketmine\command\{
 };
 use pocketmine\plugin\PluginOwned;
 use pocketmine\player\Player;
-use EnchantUI\Main;
+use EnchantShopUI\Main;
 
 class ShopCommand extends Command implements PluginOwned{
 	

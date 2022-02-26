@@ -1,5 +1,5 @@
-name: EnchantUI
-main: EnchantUI\Main
+name: EnchantShopUI
+main: EnchantShopUI\Main
 version: 0.7
 api: 4.0.0
 load: POSTWORLD
@@ -11,4 +11,4 @@ softdepend: [PiggyCustomEnchants, BedrockEconomyAPI]
 permissions:
   eshop.command:
     default: true
-    description: "use all EnchantUI Commands"
+    description: "use all EnchantShopUI Commands"

@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace EnchantUI\libs\jojoe77777\FormAPI;
+namespace EnchantShopUI\libs\jojoe77777\FormAPI;
 
 class ModalForm extends Form {
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace EnchantUI;
+namespace EnchantShopUI;
 
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\Listener;

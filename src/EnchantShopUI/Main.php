@@ -1,6 +1,6 @@
 <?php
 
-namespace EnchantUI;
+namespace EnchantShopUI;
 
 use pocketmine\Server;
 use pocketmine\player\Player;
@@ -14,7 +14,7 @@ use pocketmine\item\{
     enchantment\StringToEnchantmentParser
 };
 use pocketmine\utils\Config;
-use EnchantUI\libs\jojoe77777\FormAPI\{
+use EnchantShopUI\libs\jojoe77777\FormAPI\{
     CustomForm,
     SimpleForm
 };
@@ -32,7 +32,7 @@ class Main extends PluginBase{
 
     public function onEnable(): void{
         if (is_null($this->getServer()->getPluginManager()->getPlugin("BedrockEconomy"))) {
-            $this->getLogger()->error("in order to use EnchantUI you need to install BedrockEconomy.");
+            $this->getLogger()->error("in order to use EnchantShopUI you need to install BedrockEconomy.");
             $this->getServer()->getPluginManager()->disablePlugin($this);
             return;
         }
