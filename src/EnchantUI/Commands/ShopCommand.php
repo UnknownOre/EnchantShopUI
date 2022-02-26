@@ -11,6 +11,8 @@ use pocketmine\player\Player;
 use EnchantUI\Main;
 
 class ShopCommand extends Command implements PluginOwned{
+	
+	public $plugin;
     
     /**
     * ShopCommand constructor.
