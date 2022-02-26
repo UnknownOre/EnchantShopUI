@@ -1,29 +1,27 @@
 <?php
-namespace UnknownOre\EnchantUI\Commands;
+
+namespace EnchantUI\Commands;
+
 use pocketmine\command\{
     Command,
-    PluginCommand,
     CommandSender
 };
-use pocketmine\Player;
-use UnknownOre\EnchantUI\Main;
+use pocketmine\plugin\PluginOwned;
+use pocketmine\player\Player;
+use EnchantUI\Main;
 
-/**
- * Class ShopCommand
- * @package UnknownOre\EnchantUI\Commands
- */
-class ShopCommand extends PluginCommand{
+class ShopCommand extends Command implements PluginOwned{
     
     /**
     * ShopCommand constructor.
     * @param Main $plugin
     */
     public function __construct(Main $plugin){
-        parent::__construct('enchantui', $plugin);
+        $this->plugin = $plugin;
+        parent::__construct('enchantui');
         $this->setAliases(['eshop','es']);
         $this->setDescription('Main Enchant command');
         $this->setPermission("eshop.command");
-        $this->plugin = $plugin;
     }
     
    /**
@@ -46,4 +44,7 @@ class ShopCommand extends PluginCommand{
         return true;
 	}
    
+   public function getOwningPlugin(): Main{
+    return $this->plugin;
+   }
 }

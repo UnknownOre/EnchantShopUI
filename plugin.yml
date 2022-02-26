@@ -1,9 +1,12 @@
 name: EnchantUI
-main: UnknownOre\EnchantUI\Main
+main: EnchantUI\Main
 version: 0.6
-api: 3.0.0
+api: 4.0.0
 load: POSTWORLD
-author: UnknownOre
+author: 
+  - UnknownOre
+  - YTBJero
+
 permissions:
   eshop.command:
     default: true

@@ -1,36 +1,34 @@
 <?php
 
-namespace UnknownOre\EnchantUI;
+namespace EnchantUI;
 
-use pocketmine\{
-    Server,
-    Player
-};
+use pocketmine\Server;
+use pocketmine\player\Player;
 use pocketmine\item\{
     Item,
+    ItemFactory,
     Tool,
     Armor,
     enchantment\Enchantment,
-    enchantment\EnchantmentInstance
+    enchantment\EnchantmentInstance,
+    enchantment\StringToEnchantmentParser
 };
 use pocketmine\utils\Config;
-use UnknownOre\EnchantUI\libs\jojoe77777\FormAPI\{
+use EnchantUI\libs\jojoe77777\FormAPI\{
     CustomForm,
     SimpleForm
 };
 use pocketmine\plugin\PluginBase;
-use onebone\economyapi\EconomyAPI;
-use DaPigGuy\PiggyCustomEnchants\CustomEnchants\CustomEnchants;
+use cooldogedev\BedrockEconomy\api\BedrockEconomyAPI;
+use DaPigGuy\PiggyCustomEnchants\CustomEnchantManager;
+use DaPigGuy\PiggyCustomEnchants\enchants\CustomEnchant;
+use pocketmine\data\bedrock\EnchantmentIdMap;
 
-/**
- * Class Main
- * @package UnknownOre\EnchantUI
- */
 class Main extends PluginBase{
 
     public function onEnable(): void{
-        if (is_null($this->getServer()->getPluginManager()->getPlugin("EconomyAPI"))) {
-            $this->getLogger()->error("in order to use EnchantUI you need to install EconomyAPI.");
+        if (is_null($this->getServer()->getPluginManager()->getPlugin("BedrockEconomy"))) {
+            $this->getLogger()->error("in order to use EnchantUI you need to install BedrockEconomy.");
             $this->getServer()->getPluginManager()->disablePlugin($this);
             return;
         }
@@ -100,7 +98,7 @@ class Main extends PluginBase{
                 "NAME" => $array[$id]['name'],
                 "PRICE" => $array[$id]['price'] * $data[1],
                 "LEVEL" => $data[1],
-                "MONEY" => EconomyAPI::getInstance()->myMoney($player),
+                "MONEY" => BedrockEconomyAPI::getInstance()->getPlayerBalance($player->getName()),
                 "INCOMPATIBLE" => $incompatible = $this->isCompatible($player, $array[$id]['incompatible-enchantments'])
             );
             if ($data === null){
@@ -118,8 +116,8 @@ class Main extends PluginBase{
             if($data[1] > $array[$id]['max-level'] or $data[1] < 1){
                 return;
             }
-            if(EconomyAPI::getInstance()->myMoney($player) > $c = $array[$id]['price'] * $data[1]){
-                EconomyAPI::getInstance()->reduceMoney($player, $c);
+            if(BedrockEconomyAPI::getInstance()->getPlayerBalance($player->getName()) > $c = $array[$id]['price'] * $data[1]){
+                BedrockEconomyAPI::getInstance()->setPlayerBalance($player->getName(), BedrockEconomyAPI::getInstance()->getPlayerBalance($player->getName()) - $c);
                 $this->enchantItem($player, $data[1], $array[$id]['enchantment']);
                 $this->sendNote($player ,$this->shop->getNested('messages.paid-success'), $var);
             }else{
@@ -149,18 +147,18 @@ class Main extends PluginBase{
     public function enchantItem(Player $player, int $level, $enchantment): void{
         $item = $player->getInventory()->getItemInHand();
         if(is_string($enchantment)){
-            $ench = Enchantment::getEnchantmentByName((string) $enchantment);
+            $ench = StringToEnchantmentParser::getInstance()->parse((string) $enchantment);
             if($this->piggyCE !== null && $ench === null){
-                $ench = CustomEnchants::getEnchantmentByName((string) $enchantment);
+                $ench = CustomEnchantManager::getEnchantmentByName((string) $enchantment);
             }
-            if($this->piggyCE !== null && $ench instanceof CustomEnchants){
-                $this->piggyCE->addEnchantment($item, $ench->getName(), (int) $level);
+            if($this->piggyCE !== null){
+                $item->addEnchantment($ench, (int) $level);
             }else{
                 $item->addEnchantment(new EnchantmentInstance($ench, (int) $level));
             }
         }
         if(is_int($enchantment)){
-            $ench = Enchantment::getEnchantment($enchantment);
+            $ench = EnchantmentIdMap::getInstance()->fromId($enchantment);
             $item->addEnchantment(new EnchantmentInstance($ench, (int) $level));
         }
         $player->getInventory()->setItemInHand($item);
