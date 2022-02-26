@@ -6,6 +6,7 @@ load: POSTWORLD
 author: 
   - UnknownOre
   - YTBJero
+softdepend: [PiggyCustomEnchants, BedrockEconomyAPI]
 
 permissions:
   eshop.command:
