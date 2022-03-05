@@ -151,7 +151,7 @@ class Main extends PluginBase{
                 $ench = CustomEnchantManager::getEnchantmentByName((string) $enchantment);
             }
             if($this->piggyCE !== null){
-                $item->addEnchantment($ench, (int) $level);
+                $item->addEnchantment(new EnchantmentInstance($ench, (int) $level));
             }else{
                 $item->addEnchantment(new EnchantmentInstance($ench, (int) $level));
             }
