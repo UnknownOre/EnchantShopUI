@@ -14,7 +14,7 @@ use pocketmine\item\{
     enchantment\StringToEnchantmentParser
 };
 use pocketmine\utils\Config;
-use EnchantShopUI\libs\jojoe77777\FormAPI\{
+use YTBJero\EnchantShopUI\libs\jojoe77777\FormAPI\{
     CustomForm,
     SimpleForm
 };
