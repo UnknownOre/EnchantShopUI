@@ -8,7 +8,7 @@ use pocketmine\command\{
 };
 use pocketmine\plugin\PluginOwned;
 use pocketmine\player\Player;
-use EnchantShopUI\Main;
+use YTBJero\EnchantShopUI\Main;
 
 class ShopCommand extends Command implements PluginOwned{
 	
