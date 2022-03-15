@@ -4,8 +4,8 @@ version: 0.7
 api: 4.0.0
 load: POSTWORLD
 author: 
-  - UnknownOre
   - YTBJero
+  - UnknownOre
 softdepend: [PiggyCustomEnchants, BedrockEconomyAPI]
 
 permissions:
