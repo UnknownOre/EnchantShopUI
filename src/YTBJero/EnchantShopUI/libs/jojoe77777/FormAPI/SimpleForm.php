@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace EnchantShopUI\libs\jojoe77777\FormAPI;
+namespace YTBJero\EnchantShopUI\libs\jojoe77777\FormAPI;
 
 class SimpleForm extends Form {
 

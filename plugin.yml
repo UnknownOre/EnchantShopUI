@@ -1,5 +1,5 @@
 name: EnchantShopUI
-main: EnchantShopUI\Main
+main: YTBJero\EnchantShopUI\Main
 version: 0.7
 api: 4.0.0
 load: POSTWORLD

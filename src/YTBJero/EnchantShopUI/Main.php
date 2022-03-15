@@ -1,6 +1,6 @@
 <?php
 
-namespace EnchantShopUI;
+namespace YTBJero\EnchantShopUI;
 
 use pocketmine\Server;
 use pocketmine\player\Player;
@@ -19,7 +19,7 @@ use EnchantShopUI\libs\jojoe77777\FormAPI\{
     SimpleForm
 };
 use pocketmine\plugin\PluginBase;
-use cooldogedev\BedrockEconomy\api\BedrockEconomyAPI;
+use YTBJero\LibEconomy\Economy;
 use DaPigGuy\PiggyCustomEnchants\CustomEnchantManager;
 use DaPigGuy\PiggyCustomEnchants\enchants\CustomEnchant;
 use pocketmine\data\bedrock\EnchantmentIdMap;
@@ -31,8 +31,8 @@ class Main extends PluginBase{
     public $piggyCE;
 
     public function onEnable(): void{
-        if (is_null($this->getServer()->getPluginManager()->getPlugin("BedrockEconomy"))) {
-            $this->getLogger()->error("in order to use EnchantShopUI you need to install BedrockEconomy.");
+        if (is_null($this->getServer()->getPluginManager()->getPlugin("BedrockEconomy")) and is_null($this->getServer()->getPluginManager()->getPlugin("EconomyAPI"))) {
+            $this->getLogger()->error("in order to use EnchantShopUI you need to install Economy Plugin.");
             $this->getServer()->getPluginManager()->disablePlugin($this);
             return;
         }
@@ -102,7 +102,7 @@ class Main extends PluginBase{
                 "NAME" => $array[$id]['name'],
                 "PRICE" => $array[$id]['price'] * $data[1],
                 "LEVEL" => $data[1],
-                "MONEY" => BedrockEconomyAPI::getInstance()->getPlayerBalance($player->getName()),
+                "MONEY" => Economy::myMoney($player),
                 "INCOMPATIBLE" => $incompatible = $this->isCompatible($player, $array[$id]['incompatible-enchantments'])
             );
             if ($data === null){
@@ -120,8 +120,8 @@ class Main extends PluginBase{
             if($data[1] > $array[$id]['max-level'] or $data[1] < 1){
                 return;
             }
-            if(BedrockEconomyAPI::getInstance()->getPlayerBalance($player->getName()) > $c = $array[$id]['price'] * $data[1]){
-                BedrockEconomyAPI::getInstance()->setPlayerBalance($player->getName(), BedrockEconomyAPI::getInstance()->getPlayerBalance($player->getName()) - $c);
+            if(Economy::myMoney($player) > $c = $array[$id]['price'] * $data[1]){
+                Economy::reduceMoney($player, $c);
                 $this->enchantItem($player, $data[1], $array[$id]['enchantment']);
                 $this->sendNote($player ,$this->shop->getNested('messages.paid-success'), $var);
             }else{

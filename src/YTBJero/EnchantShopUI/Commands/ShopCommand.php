@@ -1,6 +1,6 @@
 <?php
 
-namespace EnchantShopUI\Commands;
+namespace YTBJero\EnchantShopUI\Commands;
 
 use pocketmine\command\{
     Command,

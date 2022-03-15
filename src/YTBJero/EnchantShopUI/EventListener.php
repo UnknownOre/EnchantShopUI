@@ -1,6 +1,6 @@
 <?php
 
-namespace EnchantShopUI;
+namespace YTBJero\EnchantShopUI;
 
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\Listener;

@@ -8,6 +8,8 @@ projects:
     libs:
     - src: dktapps-pm-pl/pmforms/pmforms
       version: ^1.0.0
+    - src: Eric-pm-pl/LibEconomy/LibEconomy
+      version: ^1.0.0-alpha
     lint:
       phpstan: false
 ...
