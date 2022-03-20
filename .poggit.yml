@@ -1,0 +1,7 @@
+branches:
+  - pm4
+projects:
+  EnchantUI:
+    libs:
+      - src: dktapps-pm-pl/pmforms/pmforms
+        version: ^2.0.0
