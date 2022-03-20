@@ -12,4 +12,5 @@ class SubCategory extends Category{
 	public function getParent():Category{
 		return $this->parent;
 	}
+
 }

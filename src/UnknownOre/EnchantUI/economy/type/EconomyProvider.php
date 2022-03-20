@@ -14,6 +14,6 @@ abstract class EconomyProvider{
 
 	public abstract function reduceBalance(Player $player, float $value):void;
 
-	public abstract function format(float $amount): string;
+	public abstract function format(float $amount):string;
 
 }

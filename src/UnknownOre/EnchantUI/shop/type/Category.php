@@ -3,11 +3,6 @@ declare(strict_types=1);
 
 namespace UnknownOre\EnchantUI\shop\type;
 
-use pocketmine\player\Player;
-use UnknownOre\EnchantUI\economy\EconomyManager;
-use UnknownOre\EnchantUI\libs\dktapps\pmforms\MenuForm;
-use UnknownOre\EnchantUI\libs\dktapps\pmforms\MenuOption;
-use pocketmine\utils\TextFormat as C;
 use function count;
 
 class Category{
@@ -37,49 +32,12 @@ class Category{
 		return $this->description;
 	}
 
-	public function getForm():MenuForm{
-		$options = [];
+	public function getCategories():array{
+		return $this->categories;
+	}
 
-		if($this instanceof SubCategory) {
-			$options[] = new MenuOption(C::RED . "Back");
-		}else{
-			$options[] = new MenuOption(C::RED . "Close");
-		}
-
-		$categories = $this->categories;
-		foreach($categories as $category) {
-			$options[] = new MenuOption($category->getName());
-		}
-
-		$economyManager = EconomyManager::getInstance();
-		$products = $this->products;
-
-		foreach($products as $product) {
-			$economy = $economyManager->getProviderByName($product->getEconomy());
-			if($economy !== null) { //Send an error in console?
-				$options[] = new MenuOption($product->getName() . " " . $economy->format($product->getPrice()));
-			}
-		}
-
-		return new MenuForm($this->getName(), $this->getDescription(), $options, function(Player $player, int $button) use ($categories, $products):void{
-			if($button === 0) {
-				if($this instanceof SubCategory) {
-					$player->sendForm($this->getParent()->getForm());
-				}
-				return;
-			}
-			$button--;
-
-			if(isset($categories[$button])) {
-				$category = $categories[$button];
-				$player->sendForm($category->getForm());
-				return;
-			}
-
-			$button -= (count($categories) - 1);
-
-			$product = $products[$button];
-		});
+	public function getProducts():array{
+		return $this->products;
 	}
 
 	private function load(array $data):void{

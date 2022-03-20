@@ -15,13 +15,17 @@ class EnchantUI extends PluginBase implements Listener{
 	private EconomyManager $manager;
 
 	public function onEnable():void{
-		$this->shop = new EnchantsShop();
+		$this->shop = new EnchantsShop($this);
 		$this->manager = new EconomyManager();
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 	}
 
 	public function getShop():EnchantsShop{
 		return $this->shop;
+	}
+
+	public function getEconomyManager(): EconomyManager{
+		return $this->manager;
 	}
 
 	public function onInteract(PlayerInteractEvent $event){

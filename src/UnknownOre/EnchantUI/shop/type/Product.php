@@ -8,9 +8,7 @@ use function gettype;
 class Product{
 
 	private const
-		PRICE = "price",
-		NAME = "name",
-		ECONOMY = "economy";
+		PRICE = "price", NAME = "name", ECONOMY = "economy";
 
 	private string $name, $economy;
 	private float $price;
@@ -29,16 +27,15 @@ class Product{
 		return $this->price;
 	}
 
-	public function getEconomy(): string{
+	public function getEconomy():string{
 		return $this->economy;
 	}
 
-	public function asArray(): array{
+	public function asArray():array{
 		return [
 			self::PRICE => $this->price,
 			self::NAME => $this->name,
-			self::ECONOMY => $this->economy
-		];
+			self::ECONOMY => $this->economy];
 	}
 
 	public static function create(string $name, float $price):Product{
