@@ -1,0 +1,13 @@
+name: EnchantUI
+main: UnknownOre\EnchantUI
+version: 1.0.0
+api: 4.0.0
+author: Ali
+description: Enchants Market
+permissions:
+  eshop.admin:
+    description: "Access to EnchantUI Admin features"
+    default: op
+  eshop.command:
+    description: "Access to EnchantUI command"
+    default: true
