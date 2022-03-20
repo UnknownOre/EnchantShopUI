@@ -8,19 +8,41 @@ use function gettype;
 class Product{
 
 	private const
-		PRICE = "price", NAME = "name", ECONOMY = "economy";
+		PRICE = "price", NAME = "name", MINIMUM = "minimum", MAXIMUM = "maximum", DESCRIPTION = "description", ECONOMY = "economy", SLOTS = "slots", INCOMPATIBLE = "incompatible";
 
-	private string $name, $economy;
+	private string $name, $description, $economy;
+
+	private int $minimum, $maximum;
+
 	private float $price;
+
+	private array $slots, $incompatible;
 
 	public function __construct(array $data){
 		$this->name = $data[self::NAME];
+		$this->minimum = $data[self::MINIMUM];
+		$this->maximum = $data[self::MAXIMUM];
+		$this->description = $data[self::DESCRIPTION];
 		$this->price = $data[self::PRICE];
 		$this->economy = $data[self::ECONOMY];
+		$this->slots = $data[self::SLOTS];
+		$this->incompatible = $data[self::INCOMPATIBLE];
 	}
 
 	public function getName():string{
 		return $this->name;
+	}
+
+	public function getDescription():string{
+		return $this->description;
+	}
+
+	public function getMinimumLevel(): int{
+		return $this->minimum;
+	}
+
+	public function getMaximumLevel(): int{
+		return $this->maximum;
 	}
 
 	public function getPrice():float{
@@ -31,11 +53,21 @@ class Product{
 		return $this->economy;
 	}
 
+	public function getCompatibleSlots():array{
+		return $this->slots;
+	}
+
+	public function getInCompatibleEnchantments():array{
+		return $this->incompatible;
+	}
+
 	public function asArray():array{
 		return [
 			self::PRICE => $this->price,
 			self::NAME => $this->name,
-			self::ECONOMY => $this->economy];
+			self::ECONOMY => $this->economy,
+			self::SLOTS => $this->slots,
+			self::INCOMPATIBLE => $this->incompatible];
 	}
 
 	public static function create(string $name, float $price):Product{
@@ -48,7 +80,11 @@ class Product{
 		$default = [
 			self::PRICE => 0.00,
 			self::NAME => "",
-			self::ECONOMY => ""];
+			self::MINIMUM => 0,
+			self::MAXIMUM => 0,
+			self::ECONOMY => "",
+			self::SLOTS => [],
+			self::INCOMPATIBLE => []];
 
 		foreach($default as $key => $value) {
 			if(!isset($data[$key])) {
