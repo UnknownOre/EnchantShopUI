@@ -1,5 +1,5 @@
 name: EnchantUI
-main: UnknownOre\EnchantUI
+main: UnknownOre\EnchantUI\EnchantUI
 version: 1.0.0
 api: 4.0.0
 author: Ali
