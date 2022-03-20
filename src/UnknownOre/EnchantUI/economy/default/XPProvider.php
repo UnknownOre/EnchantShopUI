@@ -10,7 +10,7 @@ use UnknownOre\EnchantUI\economy\type\EconomyProvider;
 class XPProvider extends EconomyProvider{
 
 	public function getName():string{
-		return "XP Levels";
+		return "XPLevels";
 	}
 
 	public function getBalance(Player $player, Closure $closure):void{
@@ -19,5 +19,9 @@ class XPProvider extends EconomyProvider{
 
 	public function reduceBalance(Player $player, float $value):void{
 		$player->getXpManager()->setXpLevel($player->getXpManager()->getXpLevel() - $value);
+	}
+
+	public function format(float $amount):string{
+		return $amount . " XP Levels";
 	}
 }
