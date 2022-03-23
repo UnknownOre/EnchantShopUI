@@ -1,10 +1,14 @@
-name: EnchantUI
-main: UnknownOre\EnchantUI\Main
-version: 0.6
-api: 3.0.0
+name: EnchantShopUI
+main: YTBJero\EnchantShopUI\Main
+version: 0.7
+api: 4.0.0
 load: POSTWORLD
-author: UnknownOre
+author: 
+  - YTBJero
+  - UnknownOre
+softdepend: [PiggyCustomEnchants, BedrockEconomyAPI]
+
 permissions:
   eshop.command:
     default: true
-    description: "use all EnchantUI Commands"
+    description: "use all EnchantShopUI Commands"

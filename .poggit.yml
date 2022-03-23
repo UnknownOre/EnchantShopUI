@@ -1,4 +1,4 @@
---- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/UnknownOre/EnchantShopUI
+--- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/Eric-pm-pl/EnchantShopUI
 branches:
 - master
 projects:
@@ -8,4 +8,8 @@ projects:
     libs:
     - src: dktapps-pm-pl/pmforms/pmforms
       version: ^1.0.0
+    - src: Eric-pm-pl/LibEconomy/LibEconomy
+      version: ^1.0.0-alpha
+    lint:
+      phpstan: false
 ...
