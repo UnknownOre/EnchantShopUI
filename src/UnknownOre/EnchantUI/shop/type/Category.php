@@ -19,6 +19,7 @@ class Category{
 
 	private int $lastCategoryId = 0, $lastProductId = 0;
 
+	private bool $deleted = false;
 
 	public function __construct(array $data){
 		$this->load($data);
@@ -28,16 +29,50 @@ class Category{
 		return $this->name;
 	}
 
+	public function setName(string $name): void{
+		$this->name = $name;
+	}
+
 	public function getDescription():string{
 		return $this->description;
+	}
+
+	public function setDescription(string $description): void{
+		$this->description = $description;
 	}
 
 	public function getCategories():array{
 		return $this->categories;
 	}
 
+	public function addCategory(Category $category): void{
+		$this->categories[$this->lastCategoryId] = $category;
+		$this->lastCategoryId++;
+	}
+
+	public function removeCategory(Category $category): void{
+		foreach($this->categories as $key => $target){
+			if($target === $category){
+				unset($this->categories[$key]);
+			}
+		}
+	}
+
 	public function getProducts():array{
 		return $this->products;
+	}
+
+	public function addProduct(Product $product): void{
+		$this->products[$this->lastProductId] = $product;
+		$this->lastProductId++;
+	}
+
+	public function removeProduct(Product $product): void{
+		foreach($this->products as $key => $target){
+			if($target === $product){
+				unset($this->products[$key]);
+			}
+		}
 	}
 
 	private function load(array $data):void{
@@ -58,6 +93,20 @@ class Category{
 			$this->categories[] = $category;
 		}
 		$this->lastCategoryId = count($this->categories);
+	}
+
+	public function exists(): bool{
+		return !$this->deleted;
+	}
+
+	public function delete(): void{
+		foreach($this->categories as $category){
+			$category->delete();
+		}
+
+		$this->categories = [];
+		$this->products = [];
+		$this->deleted = true;
 	}
 
 	public function asArray():array{

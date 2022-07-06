@@ -25,21 +25,26 @@ class EnchantsShop{
 	private Category $root;
 
 	public function __construct(private EnchantUI $plugin){
-		$data = yaml_parse_file($plugin->getDataFolder() . "shop.yml",);
+		$data = yaml_parse_file($plugin->getDataFolder() . "shop.yml");
 		$this->root = new Category($data);
 	}
 
 	public function send(Player $player):void{
-		$player->sendForm($this->getForm($this->root));
+		$player->sendForm($this->getForm($player, $this->root));
 	}
 
-	private function getForm(Category $category): MenuForm{
+	private function getForm(Player $player, Category $category):MenuForm{
 		$options = [];
 
-		if($this instanceof SubCategory) {
+		if($category instanceof SubCategory) {
 			$options[] = new MenuOption(C::RED . "Back");
 		}else{
 			$options[] = new MenuOption(C::RED . "Close");
+		}
+
+		if($player->hasPermission("eshop.admin")) {
+			$options[] = new MenuOption(C::DARK_AQUA . "Add Category");
+			$options[] = new MenuOption(C::DARK_AQUA . "Add Product");
 		}
 
 		$categories = $category->getCategories();
@@ -57,18 +62,20 @@ class EnchantsShop{
 			}
 		}
 
-		return new MenuForm($this->getName(), $this->getDescription(), $options, function(Player $player, int $button) use ($category, $categories, $products):void{
+		return new MenuForm($category->getName(), $category->getDescription(), $options, function(Player $player, int $button) use ($category, $categories, $products):void{
 			if($button === 0) {
-				if($this instanceof SubCategory) {
-					$player->sendForm($this->getParent()->getForm());
+				if($category instanceof SubCategory) {
+					$player->sendForm($category->getParent()->getForm());
 				}
 				return;
 			}
 			$button--;
+			if($player->hasPermission("eshop.admin")) {
+
+			}
 
 			if(isset($categories[$button])) {
-				$category = $categories[$button];
-				$player->sendForm($this->getForm($category));
+				$player->sendForm($this->getForm($player, $categories[$button]));
 				return;
 			}
 
@@ -79,7 +86,7 @@ class EnchantsShop{
 		});
 	}
 
-	private function getProductInfoForm(Category $category, Product $product, int $id): CustomForm{
+	private function getProductInfoForm(Category $category, Product $product, int $id):CustomForm{
 		$options = [];
 
 		if($product->getDescription() !== "") {
@@ -88,11 +95,27 @@ class EnchantsShop{
 
 		$options[] = new Slider("level", "Level", $product->getMinimumLevel(), $product->getMaximumLevel());
 
-		return new CustomForm($product->getName(), $options, function(Player $player, CustomFormResponse $response) use ($product, $id):void{
+		return new CustomForm($product->getName(), $options, function(Player $player, CustomFormResponse $response) use ($category, $product, $id):void{
+			if($category->exists()) {
+				$player->sendMessage(C::RED . "The category has been deleted.");
+				return;
+			}
 			$economy = EconomyManager::getInstance()->getProviderByName($product->getEconomy());
 			$level = (int) $response->getFloat("level");
-			$economy->getBalance($player, function(float $value) use ($player, $product, $id, $level):void{
+			$economy->getBalance($player, function(float $value) use ($player, $category, $product, $id, $level, $economy):void{
 				if(!$player->isConnected()) {
+					return;
+				}
+
+				if(!$category->exists()) {
+					$player->sendMessage(C::RED . "The category has been deleted.");
+					return;
+				}
+
+				$products = $category->getProducts();
+
+				if(!isset($products[$id]) || $products[$id] !== $product) {
+					$player->sendMessage(C::RED . "The product has been deleted.");
 					return;
 				}
 
@@ -101,14 +124,15 @@ class EnchantsShop{
 					return;
 				}
 
-
+				$economy->reduceBalance($player, $product->getPrice() * $level);
 			});
 		}, function(Player $player) use ($category):void{
-			$player->sendForm($this->getForm($category));
+			$player->sendForm($this->getForm($player, $category));
 		});
+
 	}
 
-	public function save(): void{
+	public function save():void{
 		yaml_emit_file($this->plugin->getDataFolder() . "shop.yml", $this->root->asArray());
 	}
 
