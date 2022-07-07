@@ -25,4 +25,8 @@ class EntriesHolder{
 		return isset($this->entries[spl_object_hash($object)]);
 	}
 
+	public function clear(): void{
+		$this->entries = [];
+	}
+
 }

@@ -7,9 +7,9 @@ use UnknownOre\EnchantUI\utils\EntriesHolder;
 use UnknownOre\EnchantUI\utils\EntryInfo;
 
 class Category{
-	const INFO = "Info";
-	const PRODUCTS = "Products";
-	const CATEGORIES = "Categories";
+	private const INFO = "Info";
+	private const PRODUCTS = "Products";
+	private const CATEGORIES = "Categories";
 
 	private EntryInfo $info;
 	private EntriesHolder $products, $categories;
@@ -46,6 +46,30 @@ class Category{
 		foreach($categories as $category) {
 			$this->categories->addEntry(new SubCategory($category, $this));
 		}
+	}
+
+	public function __asArray(): array{
+		$info = $this->info->__asArray();
+
+		$products = [];
+
+		foreach($this->products->getEntries() as $entry){
+			/** @var Product $entry */
+			$products[] = $entry->__asArray();
+		}
+
+		$categories = [];
+
+		foreach($this->categories->getEntries() as $entry){
+			/** @var SubCategory $entry */
+			$categories[] = $entry->__asArray();
+		}
+
+		return [
+			self::INFO => $info,
+			self::PRODUCTS => $products,
+			self::CATEGORIES => $categories
+		];
 	}
 
 }

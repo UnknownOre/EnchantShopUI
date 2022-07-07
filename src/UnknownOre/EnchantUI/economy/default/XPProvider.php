@@ -14,7 +14,7 @@ class XPProvider extends EconomyProvider{
 	}
 
 	public function getBalance(Player $player, Closure $closure):void{
-		$closure($player->getXpManager()->getXpLevel());
+		$closure((float) $player->getXpManager()->getXpLevel());
 	}
 
 	public function reduceBalance(Player $player, float $value):void{
