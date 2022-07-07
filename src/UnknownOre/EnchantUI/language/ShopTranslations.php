@@ -11,6 +11,8 @@ final class ShopTranslations{
 		return LanguagesManager::getInstance()->getLanguage($language);
 	}
 
+	//all functions below is auto-generated
+
 	public static function language_name(string $language):string{
 		return self::getLanguage($language)->translateString('language.name', []);
 	}

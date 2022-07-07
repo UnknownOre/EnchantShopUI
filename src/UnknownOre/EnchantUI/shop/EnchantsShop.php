@@ -188,7 +188,7 @@ class EnchantsShop{
 		$options = [
 			new MenuOption(ShopTranslations::form_button_previous($language)),
 			new MenuOption(ShopTranslations::form_button_edit_info($language)),
-			new MenuOption(ShopTranslations::form_button_edit($language)),
+			new MenuOption(ShopTranslations::form_button_add_category($language)),
 			new MenuOption(ShopTranslations::form_button_edit_products($language)),];
 
 		if($category instanceof SubCategory) {
