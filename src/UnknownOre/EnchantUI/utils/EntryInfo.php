@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace UnknownOre\EnchantUI\utils;
 
-class EntryInfo{
+class EntryInfo implements Data{
 
 	private const NAME = "name";
 	private const DESCRIPTION = "description";

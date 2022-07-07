@@ -3,10 +3,11 @@ declare(strict_types=1);
 
 namespace UnknownOre\EnchantUI\shop\type;
 
+use UnknownOre\EnchantUI\utils\Data;
 use UnknownOre\EnchantUI\utils\EntriesHolder;
 use UnknownOre\EnchantUI\utils\EntryInfo;
 
-class Category{
+class Category implements Data{
 	private const INFO = "Info";
 	private const PRODUCTS = "Products";
 	private const CATEGORIES = "Categories";
@@ -49,26 +50,10 @@ class Category{
 	}
 
 	public function __asArray(): array{
-		$info = $this->info->__asArray();
-
-		$products = [];
-
-		foreach($this->products->getEntries() as $entry){
-			/** @var Product $entry */
-			$products[] = $entry->__asArray();
-		}
-
-		$categories = [];
-
-		foreach($this->categories->getEntries() as $entry){
-			/** @var SubCategory $entry */
-			$categories[] = $entry->__asArray();
-		}
-
 		return [
-			self::INFO => $info,
-			self::PRODUCTS => $products,
-			self::CATEGORIES => $categories
+			self::INFO => $this->info->__asArray(),
+			self::PRODUCTS => $this->products->__asArray(),
+			self::CATEGORIES => $this->categories->__asArray()
 		];
 	}
 

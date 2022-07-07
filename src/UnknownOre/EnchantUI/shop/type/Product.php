@@ -3,9 +3,10 @@ declare(strict_types=1);
 
 namespace UnknownOre\EnchantUI\shop\type;
 
+use UnknownOre\EnchantUI\utils\Data;
 use UnknownOre\EnchantUI\utils\EntryInfo;
 
-class Product{
+class Product implements Data{
 
 	private const INFO = "Info";
 	private const ENCHANTMENT = "enchantment";

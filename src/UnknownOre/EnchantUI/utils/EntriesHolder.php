@@ -5,7 +5,7 @@ namespace UnknownOre\EnchantUI\utils;
 
 use function spl_object_hash;
 
-class EntriesHolder{
+class EntriesHolder implements Data{
 
 	private array $entries = [];
 
@@ -13,16 +13,26 @@ class EntriesHolder{
 		return $this->entries;
 	}
 
-	public function addEntry(Object $object): void{
+	public function addEntry(Data $object): void{
 		$this->entries[spl_object_hash($object)] = $object;
 	}
 
-	public function removeEntry(Object $object): void{
+	public function removeEntry(Data $object): void{
 		unset($this->entries[spl_object_hash($object)]);
 	}
 
-	public function entryExists(Object $object): bool{
+	public function entryExists(Data $object): bool{
 		return isset($this->entries[spl_object_hash($object)]);
+	}
+
+	public function __asArray():array{
+		$data = [];
+
+		foreach($this->entries as $entry){
+			$data[] = $entry->__asArray();
+		}
+
+		return $data;
 	}
 
 	public function clear(): void{
