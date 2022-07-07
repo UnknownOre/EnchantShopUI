@@ -54,7 +54,7 @@ class EnchantsShop{
 
 		$language = $player->getLocale();
 
-		$options[] = $category instanceof SubCategory ? ShopTranslations::form_button_previous($language) : new MenuOption(ShopTranslations::form_button_exit($language));
+		$options[] = $category instanceof SubCategory ? new MenuOption(ShopTranslations::form_button_previous($language)) : new MenuOption(ShopTranslations::form_button_exit($language));
 		$player->hasPermission("eshop.admin") && $options[] = new MenuOption(ShopTranslations::form_button_edit($language));
 
 		/** @var SubCategory[] $subCategories */
@@ -334,7 +334,11 @@ class EnchantsShop{
 		$types = ItemUtils::TYPES;
 
 		if($product->getItemType() !== "") {
-			$type = array_search(strtolower($product->getEconomy()), $types, true);
+			$type = array_search(strtolower($product->getItemType()), $types, true);
+
+			if(!is_int($type)) {
+				$enchantment = 0;
+			}
 		}else{
 			$type = 0;
 		}
