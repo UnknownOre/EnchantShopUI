@@ -351,7 +351,7 @@ class EnchantsShop{
 			$economy = $providers[$response->getInt("economy")];
 			$minimum = (int) $response->getString("minimum");
 			$maximum = (int) $response->getString("maximum");
-			$type = array_keys(ItemUtils::TYPES)[$response->getInt("type")];
+			$type = ItemUtils::TYPES[$response->getInt("type")];
 
 			$product->setEnchantment($enchantment);
 			$product->setPrice($price);
