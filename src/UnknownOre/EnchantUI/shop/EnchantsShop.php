@@ -337,7 +337,7 @@ class EnchantsShop{
 			$type = array_search(strtolower($product->getItemType()), $types, true);
 
 			if(!is_int($type)) {
-				$enchantment = 0;
+				$type = 0;
 			}
 		}else{
 			$type = 0;
