@@ -193,6 +193,9 @@ class EnchantsShop{
 					$this->save();
 					break;
 				case 3:
+					$player->sendForm($this->editProducts($category));
+					break;
+				case 4:
 					/** @var SubCategory $category */ $category->clear();
 
 					$category->getParent()->getCategories()->removeEntry($category);
