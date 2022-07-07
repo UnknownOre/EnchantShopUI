@@ -32,6 +32,7 @@ use function array_search;
 use function count;
 use function filter_var;
 use function is_int;
+use function max;
 use function strtolower;
 use const FILTER_VALIDATE_URL;
 
@@ -125,9 +126,9 @@ class EnchantsShop{
 
 		if($description !== "") {
 			$options[] = new Label("description", $description);
-			$options[] = new Label("price", ShopTranslations::form_element_item_purchase($player->getLocale(), $economy->format($product->getPrice())));
 		}
 
+		$options[] = new Label("price", ShopTranslations::form_element_item_purchase($player->getLocale(), $economy->format($product->getPrice())));
 		$options[] = new Slider("level", ShopTranslations::form_element_level($player->getLocale()), $product->getMinimumLevel(), $product->getMaximumLevel());
 
 		return new CustomForm($name, $options, function(Player $player, CustomFormResponse $response) use ($product, $parent):void{
@@ -175,6 +176,7 @@ class EnchantsShop{
 				$item->addEnchantment(new EnchantmentInstance(StringToEnchantmentParser::getInstance()->parse($product->getEnchantment()), $level));
 				$player->getInventory()->setItemInHand($item);
 				$player->sendMessage(ShopTranslations::message_success_purchase($player->getLocale(),$product->getInfo()->getName(), (string) $level, $economy->format($product->getPrice() * $level)));
+				$economy->reduceBalance($player,$product->getPrice() * $level);
 			});
 
 		}, function(Player $player) use ($parent):void{
@@ -360,8 +362,8 @@ class EnchantsShop{
 			$product->setEnchantment($enchantment);
 			$product->setPrice($price);
 			$product->setEconomy($economy);
-			$product->setMinimumLevel($minimum);
-			$product->setMaximumLevel($maximum);
+			$product->setMinimumLevel(max($minimum,1));
+			$product->setMaximumLevel(max($maximum,$product->getMinimumLevel()));
 			$product->setItemType($type);
 			$this->save();
 
