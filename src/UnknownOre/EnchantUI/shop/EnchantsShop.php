@@ -27,8 +27,10 @@ use UnknownOre\EnchantUI\utils\EntryInfo;
 use function array_keys;
 use function array_search;
 use function count;
+use function filter_var;
 use function is_int;
 use function strtolower;
+use const FILTER_VALIDATE_URL;
 
 class EnchantsShop{
 
@@ -55,7 +57,7 @@ class EnchantsShop{
 		/** @var SubCategory[] $subCategories */
 		$subCategories = $category->getCategories()->getEntries();
 		foreach($subCategories as $subCategory) {
-			$options[] = new MenuOption($subCategory->getInfo()->getName(), new FormIcon($subCategory->getInfo()->getIcon()));
+			$options[] = new MenuOption($subCategory->getInfo()->getName(), self::getFormIcon($subCategory->getInfo()->getIcon()));
 		}
 
 		$economyManager = EconomyManager::getInstance();
@@ -63,12 +65,12 @@ class EnchantsShop{
 		/** @var Product[] $products */
 		$products = $category->getProducts()->getEntries();
 		foreach($products as $key => $product) {
-			if($economyManager->getProviderByName($key) === null) {
+			if($economyManager->getProviderByName($product->getEconomy()) === null) {
 				unset($products[$key]);
 				continue;
 			}
 
-			$options[] = new MenuOption($product->getInfo()->getName(), new FormIcon($product->getInfo()->getIcon()));
+			$options[] = new MenuOption($product->getInfo()->getName(), self::getFormIcon($product->getInfo()->getIcon()));
 		}
 
 		return new MenuForm($category->getInfo()->getName(), $category->getInfo()->getDescription(), $options, function(Player $player, int $data) use ($category, $subCategories, $products):void{
@@ -234,7 +236,7 @@ class EnchantsShop{
 		/** @var Product[] $products */
 		$products = $category->getProducts()->getEntries();
 		foreach($products as $product){
-			$options[] = new MenuOption($product->getInfo()->getName(), new FormIcon($product->getInfo()->getIcon()));
+			$options[] = new MenuOption($product->getInfo()->getName(), self::getFormIcon($product->getInfo()->getIcon()));
 		}
 
 		return new MenuForm("Edit Products","",$options,function(Player $player, int $data) use ($category, $products): void{
@@ -334,5 +336,18 @@ class EnchantsShop{
 		}catch(Exception $exception){
 			$this->plugin->getLogger()->error("Couldn't save shop data: " . $exception->getMessage());
 		}
+	}
+
+	private static function getFormIcon(string $iconLink): ?FormIcon{
+		$icon = null;
+		if($iconLink !== ""){
+			if(filter_var($iconLink, FILTER_VALIDATE_URL)){
+				$icon = new FormIcon($iconLink);
+			}else{
+				$icon = new FormIcon($iconLink,FormIcon::IMAGE_TYPE_PATH);
+			}
+		}
+
+		return $icon;
 	}
 }
