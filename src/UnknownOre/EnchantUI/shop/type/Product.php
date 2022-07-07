@@ -89,10 +89,10 @@ class Product implements Data{
 
 	private function load(array $data):void{
 		$this->info = new EntryInfo($data[self::INFO] ?? []);
-		$this->enchantment = $data[self::ENCHANTMENT] ?? "";
-		$this->minimum = max($data[self::MINIMUM] ?? 0, 1);
+		$this->enchantment = $data[self::ENCHANTMENT] ?? "protection";
+		$this->minimum = max($data[self::MINIMUM] ?? 1, 1);
 		$this->maximum = max($data[self::MAXIMUM] ?? 1, $this->minimum);
-		$this->price = $data[self::PRICE] ?? 0;
+		$this->price = $data[self::PRICE] ?? 1;
 		$this->economy = $data[self::ECONOMY] ?? "";
 		$this->itemType = $data[self::ITEM_TYPE] ?? "";
 		$this->incompatible = $data[self::INCOMPATIBLE] ?? [];

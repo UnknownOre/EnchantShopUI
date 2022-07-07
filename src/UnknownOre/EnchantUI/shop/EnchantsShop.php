@@ -32,7 +32,9 @@ use function array_search;
 use function count;
 use function filter_var;
 use function is_int;
+use function is_null;
 use function max;
+use function str_replace;
 use function strtolower;
 use const FILTER_VALIDATE_URL;
 
@@ -74,7 +76,9 @@ class EnchantsShop{
 				continue;
 			}
 
-			$options[] = new MenuOption($product->getInfo()->getName(), self::getFormIcon($product->getInfo()->getIcon()));
+			$name = $product->getInfo()->getName() !== "" ? $product->getInfo()->getName() : str_replace("_"," ",$product->getEnchantment());
+
+			$options[] = new MenuOption($name, self::getFormIcon($product->getInfo()->getIcon()));
 		}
 
 		return new MenuForm($category->getInfo()->getName(), $category->getInfo()->getDescription(), $options, function(Player $player, int $data) use ($category, $subCategories, $products):void{
@@ -173,7 +177,14 @@ class EnchantsShop{
 					return;
 				}
 
-				$item->addEnchantment(new EnchantmentInstance(StringToEnchantmentParser::getInstance()->parse($product->getEnchantment()), $level));
+				$enchantment = StringToEnchantmentParser::getInstance()->parse($product->getEnchantment());
+
+				if(is_null($enchantment)){
+					//this would happen if the shop has been edited from the config directly
+					return;
+				}
+
+				$item->addEnchantment(new EnchantmentInstance($enchantment, $level));
 				$player->getInventory()->setItemInHand($item);
 				$player->sendMessage(ShopTranslations::message_success_purchase($player->getLocale(),$product->getInfo()->getName(), (string) $level, $economy->format($product->getPrice() * $level)));
 				$economy->reduceBalance($player,$product->getPrice() * $level);
