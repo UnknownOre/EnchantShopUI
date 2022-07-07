@@ -24,6 +24,7 @@ use UnknownOre\EnchantUI\shop\type\Category;
 use UnknownOre\EnchantUI\shop\type\Product;
 use UnknownOre\EnchantUI\shop\type\SubCategory;
 use UnknownOre\EnchantUI\utils\EntryInfo;
+use UnknownOre\EnchantUI\utils\ItemUtils;
 use function array_keys;
 use function array_search;
 use function count;
@@ -141,6 +142,10 @@ class EnchantsShop{
 
 				$item = $player->getInventory()->getItemInHand();
 				if($item->isNull()) {
+					return;
+				}
+
+				if(!ItemUtils::isItemCompatible($item,$product->getItemType())){
 					return;
 				}
 
@@ -269,7 +274,8 @@ class EnchantsShop{
 		return new MenuForm("Edit Product", "", [
 			new MenuOption("Back"),
 			new MenuOption("Edit Info"),
-			new MenuOption("Edit MetaData")], function(Player $player, int $data) use ($category, $product):void{
+			new MenuOption("Edit MetaData"),
+			new MenuOption("Delete")], function(Player $player, int $data) use ($category, $product):void{
 			switch($data){
 				case 0:
 					$player->sendForm($this->editProducts($category));
@@ -279,6 +285,10 @@ class EnchantsShop{
 					break;
 				case 2:
 					$player->sendForm($this->editProductMetaData($category,$product));
+					break;
+				case 3:
+					$category->getProducts()->removeEntry($product);
+					$player->sendForm($this->editProductForm($category, $product));
 					break;
 			}
 		});
@@ -304,23 +314,34 @@ class EnchantsShop{
 			$provider = 0;
 		}
 
+		$types = ItemUtils::TYPES;
+
+		if($product->getItemType() !== ""){
+			$type = array_search(strtolower($product->getEconomy()), $types, true);
+		}else{
+			$type = 0;
+		}
+
 		return new CustomForm("Edit Product MetaData", [
 			new Dropdown("enchantment", "Enchantment", $states, $enchantment),
 			new Input("price", "Price", (string) $product->getPrice()),
 			new Dropdown("economy", "Economy", $providers, $provider),
 			new Input("minimum", "Minimum Level", (string) $product->getMinimumLevel()),
-			new Input("maximum", "Maximum Level", (string) $product->getMaximumLevel()),], function(Player $player, CustomFormResponse $response) use ($category, $product, $states, $providers):void{
+			new Input("maximum", "Maximum Level", (string) $product->getMaximumLevel()),
+			new Dropdown("type", "Item Type", $types, $type)], function(Player $player, CustomFormResponse $response) use ($category, $product, $states, $providers):void{
 			$enchantment = $states[$response->getInt("enchantment")];
 			$price = (float) $response->getString("price");
 			$economy = $providers[$response->getInt("economy")];
 			$minimum = (int) $response->getString("minimum");
 			$maximum = (int) $response->getString("maximum");
+			$type = array_keys(ItemUtils::TYPES)[$response->getInt("type")];
 
 			$product->setEnchantment($enchantment);
 			$product->setPrice($price);
 			$product->setEconomy($economy);
 			$product->setMinimumLevel($minimum);
 			$product->setMaximumLevel($maximum);
+			$product->setItemType($type);
 			$this->save();
 
 			$player->sendForm($this->editProductForm($category, $product));

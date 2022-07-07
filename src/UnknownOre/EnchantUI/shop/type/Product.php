@@ -14,14 +14,14 @@ class Product implements Data{
 	private const ECONOMY = "economy";
 	private const MINIMUM = "minimum";
 	private const MAXIMUM = "maximum";
-	private const SLOTS = "slots";
+	private const ITEM_TYPE = "item type";
 	private const INCOMPATIBLE = "incompatible";
 
 	private EntryInfo $info;
-	private string $enchantment, $economy;
+	private string $enchantment, $economy, $itemType;
 	private int $minimum, $maximum;
 	private float $price;
-	private array $slots, $incompatible;
+	private array $incompatible;
 
 	public function __construct(array $data){
 		$this->load($data);
@@ -71,12 +71,12 @@ class Product implements Data{
 		$this->price = $price;
 	}
 
-	public function getCompatibleSlots():array{
-		return $this->slots;
+	public function getItemType():string{
+		return $this->itemType;
 	}
 
-	public function setCompatibleSlots(array $slots):void{
-		$this->slots = $slots;
+	public function setItemType(string $itemType):void{
+		$this->itemType = $itemType;
 	}
 
 	public function getInCompatibleEnchantments():array{
@@ -94,7 +94,7 @@ class Product implements Data{
 		$this->maximum = $data[self::MAXIMUM] ?? 1;
 		$this->price = $data[self::PRICE] ?? 0;
 		$this->economy = $data[self::ECONOMY] ?? "";
-		$this->slots = $data[self::SLOTS] ?? [];
+		$this->itemType = $data[self::ITEM_TYPE] ?? "";
 		$this->incompatible = $data[self::INCOMPATIBLE] ?? [];
 	}
 
@@ -103,7 +103,7 @@ class Product implements Data{
 			self::INFO => $this->info->__asArray(),
 			self::PRICE => $this->price,
 			self::ECONOMY => $this->economy,
-			self::SLOTS => $this->slots,
+			self::ITEM_TYPE => $this->itemType,
 			self::INCOMPATIBLE => $this->incompatible];
 	}
 
