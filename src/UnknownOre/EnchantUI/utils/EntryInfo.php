@@ -7,8 +7,9 @@ class EntryInfo implements Data{
 
 	private const NAME = "name";
 	private const DESCRIPTION = "description";
+	private const ICON = "icon";
 
-	private string $name, $description;
+	private string $name, $description, $icon;
 
 	public function __construct(array $data){
 		$this->load($data);
@@ -30,15 +31,25 @@ class EntryInfo implements Data{
 		$this->description = $description;
 	}
 
+	public function getIcon():string{
+		return $this->icon;
+	}
+
+	public function setIcon(string $icon):void{
+		$this->icon = $icon;
+	}
+
 	private function load(array $data): void{
 		$this->name = $data[self::NAME] ?? "";
 		$this->description = $data[self::DESCRIPTION] ?? "";
+		$this->icon = $data[self::ICON] ?? "";
 	}
 
 	public function __asArray():array{
 		return [
 			self::NAME => $this->name,
-			self::DESCRIPTION => $this->description
+			self::DESCRIPTION => $this->description,
+			self::ICON => $this->icon
 		];
 	}
 

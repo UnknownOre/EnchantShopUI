@@ -17,6 +17,7 @@ use UnknownOre\EnchantUI\libs\dktapps\pmforms\element\Dropdown;
 use UnknownOre\EnchantUI\libs\dktapps\pmforms\element\Input;
 use UnknownOre\EnchantUI\libs\dktapps\pmforms\element\Label;
 use UnknownOre\EnchantUI\libs\dktapps\pmforms\element\Slider;
+use UnknownOre\EnchantUI\libs\dktapps\pmforms\FormIcon;
 use UnknownOre\EnchantUI\libs\dktapps\pmforms\MenuForm;
 use UnknownOre\EnchantUI\libs\dktapps\pmforms\MenuOption;
 use UnknownOre\EnchantUI\shop\type\Category;
@@ -54,7 +55,7 @@ class EnchantsShop{
 		/** @var SubCategory[] $subCategories */
 		$subCategories = $category->getCategories()->getEntries();
 		foreach($subCategories as $subCategory) {
-			$options[] = new MenuOption($subCategory->getInfo()->getName());
+			$options[] = new MenuOption($subCategory->getInfo()->getName(), new FormIcon($subCategory->getInfo()->getIcon()));
 		}
 
 		$economyManager = EconomyManager::getInstance();
@@ -67,7 +68,7 @@ class EnchantsShop{
 				continue;
 			}
 
-			$options[] = new MenuOption($product->getInfo()->getName());
+			$options[] = new MenuOption($product->getInfo()->getName(), new FormIcon($product->getInfo()->getIcon()));
 		}
 
 		return new MenuForm($category->getInfo()->getName(), $category->getInfo()->getDescription(), $options, function(Player $player, int $data) use ($category, $subCategories, $products):void{
@@ -209,12 +210,15 @@ class EnchantsShop{
 	private function editInfoForm(EntryInfo $info, Form $back): CustomForm{
 		return new CustomForm($info->getName(), [
 			new Input("name", "Name", $info->getName(), $info->getName()),
-			new Input("description", "Description", $info->getDescription(), $info->getDescription())], function(Player $player, CustomFormResponse $response) use ($info, $back):void{
+			new Input("description", "Description", $info->getDescription(), $info->getDescription()),
+			new Input("icon","Icon",$info->getIcon(), $info->getIcon())], function(Player $player, CustomFormResponse $response) use ($info, $back):void{
 			$name = $response->getString("name");
 			$description = $response->getString("description");
+			$icon = $response->getString("icon");
 
 			$info->setName($name);
 			$info->setDescription($description);
+			$info->setIcon($icon);
 
 			$this->save();
 			$player->sendForm($back);
@@ -230,7 +234,7 @@ class EnchantsShop{
 		/** @var Product[] $products */
 		$products = $category->getProducts()->getEntries();
 		foreach($products as $product){
-			$options[] = new MenuOption($product->getInfo()->getName());
+			$options[] = new MenuOption($product->getInfo()->getName(), new FormIcon($product->getInfo()->getIcon()));
 		}
 
 		return new MenuForm("Edit Products","",$options,function(Player $player, int $data) use ($category, $products): void{
@@ -307,8 +311,8 @@ class EnchantsShop{
 			$enchantment = $states[$response->getInt("enchantment")];
 			$price = (float) $response->getString("price");
 			$economy = $providers[$response->getInt("economy")];
-			$minimum = (int) $response->getFloat("minimum");
-			$maximum = (int) $response->getFloat("maximum");
+			$minimum = (int) $response->getString("minimum");
+			$maximum = (int) $response->getString("maximum");
 
 			$product->setEnchantment($enchantment);
 			$product->setPrice($price);
