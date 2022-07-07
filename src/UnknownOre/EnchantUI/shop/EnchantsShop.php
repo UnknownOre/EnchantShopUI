@@ -250,7 +250,6 @@ class EnchantsShop{
 			$data--;
 
 			$product = $products[array_keys($products)[$data]];
-
 			if($category->getProducts()->entryExists($product)){
 				$player->sendForm($this->editProductForm($category, $product));
 				return;
@@ -280,7 +279,7 @@ class EnchantsShop{
 	}
 
 	private function editProductMetaData(Category $category, Product $product): CustomForm{
-		$states = StringToEnchantmentParser::getInstance()->getAllKnownStates();
+		$states = StringToEnchantmentParser::getInstance()->getKnownAliases();
 
 		if($product->getEnchantment() !== "") {
 			$enchantment = array_search($product->getEnchantment(), $states, true);
@@ -304,7 +303,20 @@ class EnchantsShop{
 			new Input("price", "Price", (string) $product->getPrice()),
 			new Dropdown("economy", "Economy", $providers, $provider),
 			new Input("minimum", "Minimum Level", (string) $product->getMinimumLevel()),
-			new Input("maximum", "Maximum Level", (string) $product->getMaximumLevel()),], function(Player $player, CustomFormResponse $response) use ($category, $product):void{
+			new Input("maximum", "Maximum Level", (string) $product->getMaximumLevel()),], function(Player $player, CustomFormResponse $response) use ($category, $product, $states, $providers):void{
+			$enchantment = $states[$response->getInt("enchantment")];
+			$price = (float) $response->getString("price");
+			$economy = $providers[$response->getInt("economy")];
+			$minimum = (int) $response->getFloat("minimum");
+			$maximum = (int) $response->getFloat("maximum");
+
+			$product->setEnchantment($enchantment);
+			$product->setPrice($price);
+			$product->setEconomy($economy);
+			$product->setMinimumLevel($minimum);
+			$product->setMaximumLevel($maximum);
+			$this->save();
+
 			$player->sendForm($this->editProductForm($category, $product));
 		});
 	}

@@ -14,8 +14,7 @@ class EnchantShopCommand extends Command implements PluginOwned{
 
 	public function __construct(private EnchantUI $plugin){
 		parent::__construct("eshop", "Opens Enchantment Shop menu.", "", [
-			"enchantui",
-			"enchantshop"]);
+			"es"]);
 	}
 
 	public function execute(CommandSender $sender, string $commandLabel, array $args){
