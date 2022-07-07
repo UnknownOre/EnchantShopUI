@@ -70,7 +70,7 @@ class EnchantsShop{
 			$options[] = new MenuOption($product->getInfo()->getName());
 		}
 
-		return new MenuForm($category->getInfo()->getDescription(), $category->getInfo()->getDescription(), $options, function(Player $player, int $data) use ($category, $subCategories, $products):void{
+		return new MenuForm($category->getInfo()->getName(), $category->getInfo()->getDescription(), $options, function(Player $player, int $data) use ($category, $subCategories, $products):void{
 			if($data === 0) {
 				$category instanceof SubCategory && $player->sendForm($this->getCategoryForm($player, $category->getParent()));
 				return;
@@ -196,7 +196,8 @@ class EnchantsShop{
 					$player->sendForm($this->editProducts($category));
 					break;
 				case 4:
-					/** @var SubCategory $category */ $category->clear();
+					/** @var SubCategory $category */
+					$category->clear();
 
 					$category->getParent()->getCategories()->removeEntry($category);
 					$this->save();
@@ -222,7 +223,8 @@ class EnchantsShop{
 
 	private function editProducts(Category $category): MenuForm{
 		$options = [
-			new MenuOption("Back")
+			new MenuOption("Back"),
+			new MenuOption("Add Product")
 		];
 
 		/** @var Product[] $products */
@@ -237,6 +239,15 @@ class EnchantsShop{
 				return;
 			}
 			$data--;
+			if($data === 0){
+				$product = new Product([]);
+				$category->getProducts()->addEntry($product);
+				$this->save();
+				$player->sendForm($this->editProductForm($category, $product));
+				return;
+			}
+
+			$data--;
 
 			$product = $products[array_keys($products)[$data]];
 
@@ -250,7 +261,6 @@ class EnchantsShop{
 	}
 
 	private function editProductForm(Category $category, Product $product): MenuForm{
-
 		return new MenuForm("Edit Product", "", [
 			new MenuOption("Back"),
 			new MenuOption("Edit Info"),
@@ -294,8 +304,8 @@ class EnchantsShop{
 			new Input("price", "Price", (string) $product->getPrice()),
 			new Dropdown("economy", "Economy", $providers, $provider),
 			new Input("minimum", "Minimum Level", (string) $product->getMinimumLevel()),
-			new Input("maximum", "Maximum Level", (string) $product->getMaximumLevel()),], function(Player $player, CustomFormResponse $response):void{
-
+			new Input("maximum", "Maximum Level", (string) $product->getMaximumLevel()),], function(Player $player, CustomFormResponse $response) use ($category, $product):void{
+			$player->sendForm($this->editProductForm($category, $product));
 		});
 	}
 
