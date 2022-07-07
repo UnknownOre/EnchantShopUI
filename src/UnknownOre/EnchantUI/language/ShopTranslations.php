@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace UnknownOre\EnchantUI\language;
 
@@ -102,7 +103,37 @@ final class ShopTranslations{
 		return self::getLanguage($language)->translateString('form.element.item.type', []);
 	}
 
+	public static function form_element_item_purchase(string $language, string $param0):string{
+		return self::getLanguage($language)->translateString('form.element.item.purchase', [0 => $param0,]);
+	}
+
 	public static function message_error_save_failed(string $language, string $param0):string{
 		return self::getLanguage($language)->translateString('message.error.save.failed', [0 => $param0,]);
 	}
+
+	public static function message_error_insufficient_balance(string $language, string $param0, string $param1):string{
+		return self::getLanguage($language)->translateString('message.error.insufficient.balance', [
+			0 => $param0,
+			1 => $param1,]);
+	}
+
+	public static function message_error_item_null(string $language):string{
+		return self::getLanguage($language)->translateString('message.error.item.null', []);
+	}
+
+	public static function message_error_item_incompatible(string $language):string{
+		return self::getLanguage($language)->translateString('message.error.item.incompatible', []);
+	}
+
+	public static function message_error_item_incompatible_enchantments(string $language):string{
+		return self::getLanguage($language)->translateString('message.error.item.incompatible.enchantments', []);
+	}
+
+	public static function message_success_purchase(string $language, string $param0, string $param1, string $param2):string{
+		return self::getLanguage($language)->translateString('message.success.purchase', [
+			0 => $param0,
+			1 => $param1,
+			2 => $param2,]);
+	}
+
 }

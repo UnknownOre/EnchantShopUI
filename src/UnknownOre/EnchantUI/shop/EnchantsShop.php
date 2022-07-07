@@ -37,8 +37,6 @@ use const FILTER_VALIDATE_URL;
 
 class EnchantsShop{
 
-	//TODO: Messages
-
 	private Category $root;
 	private Config $config;
 
@@ -123,8 +121,11 @@ class EnchantsShop{
 		$name = $info->getName();
 		$description = $info->getDescription();
 
+		$economy = EconomyManager::getInstance()->getProviderByName($product->getEconomy());
+
 		if($description !== "") {
 			$options[] = new Label("description", $description);
+			$options[] = new Label("price", ShopTranslations::form_element_item_purchase($player->getLocale(), $economy->format($product->getPrice())));
 		}
 
 		$options[] = new Slider("level", ShopTranslations::form_element_level($player->getLocale()), $product->getMinimumLevel(), $product->getMaximumLevel());
@@ -134,41 +135,46 @@ class EnchantsShop{
 
 			$economy = EconomyManager::getInstance()->getProviderByName($product->getEconomy());
 
-			$economy->getBalance($player, function(float $amount) use ($product, $player, $level):void{
+			$economy->getBalance($player, function(float $amount) use ($product, $player, $level, $economy):void{
 				if(!$player->isOnline()) {
 					//there's a chance the player would leave before the provider receives the player balance (async)
 					return;
 				}
 
 				if($amount < $product->getPrice() * $level) {
+					$player->sendMessage(ShopTranslations::message_error_insufficient_balance($player->getLocale(), $economy->getName(), $economy->format($product->getPrice() * $level)));
 					return;
 				}
 
 				$item = $player->getInventory()->getItemInHand();
 				if($item->isNull()) {
+					$player->sendMessage(ShopTranslations::message_error_item_null($player->getLocale()));
 					return;
 				}
 
 				if(!ItemUtils::isItemCompatible($item, $product->getItemType())) {
+					$player->sendMessage(ShopTranslations::message_error_item_incompatible($player->getLocale()));
 					return;
 				}
 
 				$incompatible = $product->getInCompatibleEnchantments();
 
-				$restricted = [];
+				$compatible = true;
 
 				foreach($incompatible as $id) {
 					if($item->hasEnchantment($id)) {
-						$restricted[] = $id;
+						$compatible = false;
 					}
 				}
 
-				if($restricted !== []) {
+				if(!$compatible) {
+					$player->sendMessage(ShopTranslations::message_error_item_incompatible_enchantments($player->getLocale()));
 					return;
 				}
 
 				$item->addEnchantment(new EnchantmentInstance(StringToEnchantmentParser::getInstance()->parse($product->getEnchantment()), $level));
 				$player->getInventory()->setItemInHand($item);
+				$player->sendMessage(ShopTranslations::message_success_purchase($player->getLocale(),$product->getInfo()->getName(), (string) $level, $economy->format($product->getPrice() * $level)));
 			});
 
 		}, function(Player $player) use ($parent):void{
