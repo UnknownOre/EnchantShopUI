@@ -3,13 +3,11 @@ declare(strict_types=1);
 
 namespace UnknownOre\EnchantUI;
 
-use pocketmine\event\Listener;
-use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\plugin\PluginBase;
 use UnknownOre\EnchantUI\economy\EconomyManager;
 use UnknownOre\EnchantUI\shop\EnchantsShop;
 
-class EnchantUI extends PluginBase implements Listener{
+class EnchantUI extends PluginBase{
 
 	private EnchantsShop $shop;
 	private EconomyManager $manager;
@@ -17,7 +15,6 @@ class EnchantUI extends PluginBase implements Listener{
 	public function onEnable():void{
 		$this->shop = new EnchantsShop($this);
 		$this->manager = new EconomyManager();
-		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 	}
 
 	public function getShop():EnchantsShop{
@@ -26,11 +23,6 @@ class EnchantUI extends PluginBase implements Listener{
 
 	public function getEconomyManager(): EconomyManager{
 		return $this->manager;
-	}
-
-	public function onInteract(PlayerInteractEvent $event){
-		$player = $event->getPlayer();
-
 	}
 
 }

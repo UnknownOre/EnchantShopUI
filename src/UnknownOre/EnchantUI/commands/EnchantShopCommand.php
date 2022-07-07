@@ -13,9 +13,8 @@ use UnknownOre\EnchantUI\EnchantUI;
 class EnchantShopCommand extends Command implements PluginOwned{
 
 	public function __construct(private EnchantUI $plugin){
-		parent::__construct("enchantui", "opens Enchantment Shop menu.", "", [
-			"eshop",
-			"es",
+		parent::__construct("eshop", "Opens Enchantment Shop menu.", "", [
+			"enchantui",
 			"enchantshop"]);
 	}
 
