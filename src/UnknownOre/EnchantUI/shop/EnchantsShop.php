@@ -8,9 +8,11 @@ use pocketmine\form\Form;
 use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\enchantment\StringToEnchantmentParser;
 use pocketmine\player\Player;
+use pocketmine\Server;
 use pocketmine\utils\Config;
 use UnknownOre\EnchantUI\economy\EconomyManager;
 use UnknownOre\EnchantUI\EnchantUI;
+use UnknownOre\EnchantUI\language\ShopTranslations;
 use UnknownOre\EnchantUI\libs\dktapps\pmforms\CustomForm;
 use UnknownOre\EnchantUI\libs\dktapps\pmforms\CustomFormResponse;
 use UnknownOre\EnchantUI\libs\dktapps\pmforms\element\Dropdown;
@@ -52,8 +54,10 @@ class EnchantsShop{
 	private function getCategoryForm(Player $player, Category $category):MenuForm{
 		$options = [];
 
-		$options[] = $category instanceof SubCategory ? new MenuOption("Back") : new MenuOption("Close");
-		$player->hasPermission("eshop.admin") && $options[] = new MenuOption("Edit");
+		$language = $player->getLocale();
+
+		$options[] = $category instanceof SubCategory ? ShopTranslations::form_button_previous($language) : new MenuOption(ShopTranslations::form_button_exit($player->getLocale()));
+		$player->hasPermission("eshop.admin") && $options[] = new MenuOption(ShopTranslations::form_button_edit($language));
 
 		/** @var SubCategory[] $subCategories */
 		$subCategories = $category->getCategories()->getEntries();
@@ -84,7 +88,7 @@ class EnchantsShop{
 
 			if($player->hasPermission("eshop.admin")) {
 				if($data === 0) {
-					$player->sendForm($this->editCategoryMenu($category));
+					$player->sendForm($this->editCategoryMenu($player, $category));
 					return;
 				}
 
@@ -106,12 +110,12 @@ class EnchantsShop{
 			$product = $products[array_keys($products)[$data]];
 
 			if($category->getProducts()->entryExists($product)) {
-				$player->sendForm($this->getProductForm($product, $category));
+				$player->sendForm($this->getProductForm($player, $product, $category));
 			}
 		});
 	}
 
-	private function getProductForm(Product $product, Category $parent):CustomForm{
+	private function getProductForm(Player $player, Product $product, Category $parent):CustomForm{
 		$options = [];
 
 		$info = $product->getInfo();
@@ -123,20 +127,20 @@ class EnchantsShop{
 			$options[] = new Label("description", $description);
 		}
 
-		$options[] = new Slider("level", "Level", $product->getMinimumLevel(), $product->getMaximumLevel());
+		$options[] = new Slider("level", ShopTranslations::form_element_level($player->getLocale()), $product->getMinimumLevel(), $product->getMaximumLevel());
 
 		return new CustomForm($name, $options, function(Player $player, CustomFormResponse $response) use ($product, $parent):void{
 			$level = (int) $response->getFloat("level");
 
 			$economy = EconomyManager::getInstance()->getProviderByName($product->getEconomy());
 
-			$economy->getBalance($player, function(float $amount ) use ($product, $player, $level): void{
-				if(!$player->isOnline()){
+			$economy->getBalance($player, function(float $amount) use ($product, $player, $level):void{
+				if(!$player->isOnline()) {
 					//there's a chance the player would leave before the provider receives the player balance (async)
 					return;
 				}
 
-				if($amount < $product->getPrice() * $level){
+				if($amount < $product->getPrice() * $level) {
 					return;
 				}
 
@@ -145,7 +149,7 @@ class EnchantsShop{
 					return;
 				}
 
-				if(!ItemUtils::isItemCompatible($item,$product->getItemType())){
+				if(!ItemUtils::isItemCompatible($item, $product->getItemType())) {
 					return;
 				}
 
@@ -153,19 +157,18 @@ class EnchantsShop{
 
 				$restricted = [];
 
-				foreach($incompatible as $id){
-					if($item->hasEnchantment($id)){
+				foreach($incompatible as $id) {
+					if($item->hasEnchantment($id)) {
 						$restricted[] = $id;
 					}
 				}
 
-				if($restricted !== []){
+				if($restricted !== []) {
 					return;
 				}
 
-				//todo: slots compatibility
-
 				$item->addEnchantment(new EnchantmentInstance(StringToEnchantmentParser::getInstance()->parse($product->getEnchantment()), $level));
+				$player->getInventory()->setItemInHand($item);
 			});
 
 		}, function(Player $player) use ($parent):void{
@@ -173,39 +176,39 @@ class EnchantsShop{
 		});
 	}
 
-	private function editCategoryMenu(Category $category): MenuForm{
+	private function editCategoryMenu(Player $player, Category $category):MenuForm{
+		$language = $player->getLocale();
+
 		$options = [
-			new MenuOption("Back"),
-			new MenuOption("Edit Info"),
-			new MenuOption("Add Category"),
-			new MenuOption("Edit Products"),
-		];
+			new MenuOption(ShopTranslations::form_button_previous($language)),
+			new MenuOption(ShopTranslations::form_button_edit_info($language)),
+			new MenuOption(ShopTranslations::form_button_edit($language)),
+			new MenuOption(ShopTranslations::form_button_delete($language)),];
 
 		if($category instanceof SubCategory) {
 			$options[] = new MenuOption("Delete");
 		}
 
-		return new MenuForm("Edit ".$category->getInfo()->getName(),"",$options,function(Player $player, int $data) use ($category): void{
+		return new MenuForm(ShopTranslations::form_title_edit_category($language), "", $options, function(Player $player, int $data) use ($category):void{
 			switch($data){
 				case 0:
 					$player->sendForm($this->getCategoryForm($player, $category));
 					break;
 				case 1:
-					$player->sendForm($this->editInfoForm($category->getInfo(), $this->editCategoryMenu($category)));
+					$player->sendForm($this->editInfoForm($player,$category->getInfo(), $this->editCategoryMenu($player, $category)));
 					break;
 				case 2:
 					$subCategory = new SubCategory([], $category);
 
 					$category->getCategories()->addEntry($subCategory);
-					$player->sendForm($this->editCategoryMenu($subCategory));
+					$player->sendForm($this->editCategoryMenu($player, $subCategory));
 					$this->save();
 					break;
 				case 3:
-					$player->sendForm($this->editProducts($category));
+					$player->sendForm($this->editProducts($player, $category));
 					break;
 				case 4:
-					/** @var SubCategory $category */
-					$category->clear();
+					/** @var SubCategory $category */ $category->clear();
 
 					$category->getParent()->getCategories()->removeEntry($category);
 					$this->save();
@@ -214,11 +217,13 @@ class EnchantsShop{
 		});
 	}
 
-	private function editInfoForm(EntryInfo $info, Form $back): CustomForm{
+	private function editInfoForm(Player $player,EntryInfo $info, Form $back):CustomForm{
+		$language = $player->getLocale();
+
 		return new CustomForm($info->getName(), [
-			new Input("name", "Name", $info->getName(), $info->getName()),
-			new Input("description", "Description", $info->getDescription(), $info->getDescription()),
-			new Input("icon","Icon",$info->getIcon(), $info->getIcon())], function(Player $player, CustomFormResponse $response) use ($info, $back):void{
+			new Input("name", ShopTranslations::form_element_name($language), $info->getName(), $info->getName()),
+			new Input("description", ShopTranslations::form_element_description($language), $info->getDescription(), $info->getDescription()),
+			new Input("icon", ShopTranslations::form_element_icon($language), $info->getIcon(), $info->getIcon())], function(Player $player, CustomFormResponse $response) use ($info, $back):void{
 			$name = $response->getString("name");
 			$description = $response->getString("description");
 			$icon = $response->getString("icon");
@@ -232,69 +237,75 @@ class EnchantsShop{
 		});
 	}
 
-	private function editProducts(Category $category): MenuForm{
+	private function editProducts(Player $player, Category $category):MenuForm{
+		$language = $player->getLocale();
+
 		$options = [
-			new MenuOption("Back"),
-			new MenuOption("Add Product")
-		];
+			new MenuOption(ShopTranslations::form_button_previous($language)),
+			new MenuOption(ShopTranslations::form_button_add_product($language))];
 
 		/** @var Product[] $products */
 		$products = $category->getProducts()->getEntries();
-		foreach($products as $product){
+		foreach($products as $product) {
 			$options[] = new MenuOption($product->getInfo()->getName(), self::getFormIcon($product->getInfo()->getIcon()));
 		}
 
-		return new MenuForm("Edit Products","",$options,function(Player $player, int $data) use ($category, $products): void{
-			if($data === 0){
-				$player->sendForm($this->editCategoryMenu($category));
+		return new MenuForm(ShopTranslations::form_title_edit_products($language), "", $options, function(Player $player, int $data) use ($category, $products):void{
+			if($data === 0) {
+				$player->sendForm($this->editCategoryMenu($player, $category));
 				return;
 			}
 			$data--;
-			if($data === 0){
+			if($data === 0) {
 				$product = new Product([]);
 				$category->getProducts()->addEntry($product);
 				$this->save();
-				$player->sendForm($this->editProductForm($category, $product));
+				$player->sendForm($this->editProductForm($player, $category, $product));
 				return;
 			}
 
 			$data--;
 
 			$product = $products[array_keys($products)[$data]];
-			if($category->getProducts()->entryExists($product)){
-				$player->sendForm($this->editProductForm($category, $product));
+			if($category->getProducts()->entryExists($product)) {
+				$player->sendForm($this->editProductForm($player, $category, $product));
 				return;
 			}
 
-			$player->sendForm($this->editProducts($category));
+
+			$player->sendForm($this->editProducts($player, $category));
 		});
 	}
 
-	private function editProductForm(Category $category, Product $product): MenuForm{
-		return new MenuForm("Edit Product", "", [
-			new MenuOption("Back"),
-			new MenuOption("Edit Info"),
-			new MenuOption("Edit MetaData"),
-			new MenuOption("Delete")], function(Player $player, int $data) use ($category, $product):void{
+	private function editProductForm(Player $player, Category $category, Product $product):MenuForm{
+		$language = $player->getLocale();
+
+		return new MenuForm(ShopTranslations::form_title_edit_product($language), "", [
+			new MenuOption(ShopTranslations::form_button_previous($language)),
+			new MenuOption(ShopTranslations::form_button_edit_info($language)),
+			new MenuOption(ShopTranslations::form_button_edit_metadata($language)),
+			new MenuOption(ShopTranslations::form_button_delete($language))], function(Player $player, int $data) use ($category, $product):void{
 			switch($data){
 				case 0:
-					$player->sendForm($this->editProducts($category));
+					$player->sendForm($this->editProducts($player, $category));
 					break;
 				case 1:
-					$player->sendForm($this->editInfoForm($product->getInfo(),$this->editProductForm($category,$product)));
+					$player->sendForm($this->editInfoForm($player, $product->getInfo(), $this->editProductForm($player, $category, $product)));
 					break;
 				case 2:
-					$player->sendForm($this->editProductMetaData($category,$product));
+					$player->sendForm($this->editProductMetaData($player, $category, $product));
 					break;
 				case 3:
 					$category->getProducts()->removeEntry($product);
-					$player->sendForm($this->editProductForm($category, $product));
+					$player->sendForm($this->editProducts($player, $category));
 					break;
 			}
 		});
 	}
 
-	private function editProductMetaData(Category $category, Product $product): CustomForm{
+	private function editProductMetaData(Player $player, Category $category, Product $product):CustomForm{
+		$language = $player->getLocale();
+
 		$states = StringToEnchantmentParser::getInstance()->getKnownAliases();
 
 		if($product->getEnchantment() !== "") {
@@ -316,19 +327,19 @@ class EnchantsShop{
 
 		$types = ItemUtils::TYPES;
 
-		if($product->getItemType() !== ""){
+		if($product->getItemType() !== "") {
 			$type = array_search(strtolower($product->getEconomy()), $types, true);
 		}else{
 			$type = 0;
 		}
 
-		return new CustomForm("Edit Product MetaData", [
-			new Dropdown("enchantment", "Enchantment", $states, $enchantment),
-			new Input("price", "Price", (string) $product->getPrice()),
-			new Dropdown("economy", "Economy", $providers, $provider),
-			new Input("minimum", "Minimum Level", (string) $product->getMinimumLevel()),
-			new Input("maximum", "Maximum Level", (string) $product->getMaximumLevel()),
-			new Dropdown("type", "Item Type", $types, $type)], function(Player $player, CustomFormResponse $response) use ($category, $product, $states, $providers):void{
+		return new CustomForm(ShopTranslations::form_button_edit_metadata($language), [
+			new Dropdown("enchantment", ShopTranslations::form_element_enchantment($language), $states, $enchantment),
+			new Input("price", ShopTranslations::form_element_price($language), (string) $product->getPrice()),
+			new Dropdown("economy", ShopTranslations::form_element_economy($language), $providers, $provider),
+			new Input("minimum", ShopTranslations::form_element_level_min($language), (string) $product->getMinimumLevel()),
+			new Input("maximum", ShopTranslations::form_element_level_max($language), (string) $product->getMaximumLevel()),
+			new Dropdown("type", ShopTranslations::form_element_item_type($language), $types, $type)], function(Player $player, CustomFormResponse $response) use ($category, $product, $states, $providers):void{
 			$enchantment = $states[$response->getInt("enchantment")];
 			$price = (float) $response->getString("price");
 			$economy = $providers[$response->getInt("economy")];
@@ -344,10 +355,9 @@ class EnchantsShop{
 			$product->setItemType($type);
 			$this->save();
 
-			$player->sendForm($this->editProductForm($category, $product));
+			$player->sendForm($this->editProductForm($player, $category, $product));
 		});
 	}
-
 
 
 	private function save():void{
@@ -355,17 +365,19 @@ class EnchantsShop{
 		try{
 			$this->config->save();
 		}catch(Exception $exception){
-			$this->plugin->getLogger()->error("Couldn't save shop data: " . $exception->getMessage());
+			$lang = Server::getInstance()->getLanguage()->getLang();
+
+			$this->plugin->getLogger()->error(ShopTranslations::message_error_save_failed($lang, $exception->getMessage()));
 		}
 	}
 
-	private static function getFormIcon(string $iconLink): ?FormIcon{
+	private static function getFormIcon(string $iconLink):?FormIcon{
 		$icon = null;
-		if($iconLink !== ""){
-			if(filter_var($iconLink, FILTER_VALIDATE_URL)){
+		if($iconLink !== "") {
+			if(filter_var($iconLink, FILTER_VALIDATE_URL)) {
 				$icon = new FormIcon($iconLink);
 			}else{
-				$icon = new FormIcon($iconLink,FormIcon::IMAGE_TYPE_PATH);
+				$icon = new FormIcon($iconLink, FormIcon::IMAGE_TYPE_PATH);
 			}
 		}
 
