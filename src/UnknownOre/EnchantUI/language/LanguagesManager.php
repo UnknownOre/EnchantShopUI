@@ -29,7 +29,7 @@ class LanguagesManager{
 			return $this->languages[$code];
 		}
 
-		return $this->languages["eng"];
+		return $this->languages[self::FALLBACK_LANGUAGE];
 	}
 
 	private function load(): void{

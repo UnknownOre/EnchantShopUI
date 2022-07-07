@@ -56,7 +56,7 @@ class EnchantsShop{
 
 		$language = $player->getLocale();
 
-		$options[] = $category instanceof SubCategory ? ShopTranslations::form_button_previous($language) : new MenuOption(ShopTranslations::form_button_exit($player->getLocale()));
+		$options[] = $category instanceof SubCategory ? ShopTranslations::form_button_previous($language) : new MenuOption(ShopTranslations::form_button_exit($language));
 		$player->hasPermission("eshop.admin") && $options[] = new MenuOption(ShopTranslations::form_button_edit($language));
 
 		/** @var SubCategory[] $subCategories */
@@ -183,10 +183,10 @@ class EnchantsShop{
 			new MenuOption(ShopTranslations::form_button_previous($language)),
 			new MenuOption(ShopTranslations::form_button_edit_info($language)),
 			new MenuOption(ShopTranslations::form_button_edit($language)),
-			new MenuOption(ShopTranslations::form_button_delete($language)),];
+			new MenuOption(ShopTranslations::form_button_edit_products($language)),];
 
 		if($category instanceof SubCategory) {
-			$options[] = new MenuOption("Delete");
+			$options[] = new MenuOption(ShopTranslations::form_button_delete($language));
 		}
 
 		return new MenuForm(ShopTranslations::form_title_edit_category($language), "", $options, function(Player $player, int $data) use ($category):void{
