@@ -6,6 +6,7 @@ namespace UnknownOre\EnchantUI\economy;
 use UnknownOre\EnchantUI\economy\default\XPProvider;
 use UnknownOre\EnchantUI\economy\type\EconomyProvider;
 use function strcasecmp;
+use function strtolower;
 
 class EconomyManager{
 
@@ -28,17 +29,11 @@ class EconomyManager{
 	}
 
 	public function register(EconomyProvider $provider):void{
-		$this->providers[] = $provider;
+		$this->providers[strtolower($provider->getName())] = $provider;
 	}
 
 	public function getProviderByName(string $name):?EconomyProvider{
-		foreach($this->providers as $provider) {
-			if(strcasecmp($name, $provider->getName()) === 0) {
-				return $provider;
-			}
-		}
-
-		return null;
+		return $this->providers[strtolower($name)] ?? null;
 	}
 
 }

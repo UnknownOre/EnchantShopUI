@@ -31,6 +31,18 @@ class Category implements Data{
 		return $this->categories;
 	}
 
+	public function clear(): void{
+		/** @var SubCategory[] $categories */
+		$categories = $this->getCategories()->getEntries();
+
+		foreach($categories as $category){
+			$category->clear();
+		}
+
+		$this->categories->clear();
+		$this->products->clear();
+	}
+
 	private function load(array $data): void{
 		$this->info = new EntryInfo($data[self::INFO] ?? []);
 

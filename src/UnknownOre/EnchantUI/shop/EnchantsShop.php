@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace UnknownOre\EnchantUI\shop;
 
 use Exception;
+use pocketmine\form\Form;
 use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\enchantment\StringToEnchantmentParser;
 use pocketmine\player\Player;
@@ -12,6 +13,8 @@ use UnknownOre\EnchantUI\economy\EconomyManager;
 use UnknownOre\EnchantUI\EnchantUI;
 use UnknownOre\EnchantUI\libs\dktapps\pmforms\CustomForm;
 use UnknownOre\EnchantUI\libs\dktapps\pmforms\CustomFormResponse;
+use UnknownOre\EnchantUI\libs\dktapps\pmforms\element\Dropdown;
+use UnknownOre\EnchantUI\libs\dktapps\pmforms\element\Input;
 use UnknownOre\EnchantUI\libs\dktapps\pmforms\element\Label;
 use UnknownOre\EnchantUI\libs\dktapps\pmforms\element\Slider;
 use UnknownOre\EnchantUI\libs\dktapps\pmforms\MenuForm;
@@ -19,9 +22,12 @@ use UnknownOre\EnchantUI\libs\dktapps\pmforms\MenuOption;
 use UnknownOre\EnchantUI\shop\type\Category;
 use UnknownOre\EnchantUI\shop\type\Product;
 use UnknownOre\EnchantUI\shop\type\SubCategory;
+use UnknownOre\EnchantUI\utils\EntryInfo;
 use function array_keys;
+use function array_search;
 use function count;
-use function is_array;
+use function is_int;
+use function strtolower;
 
 class EnchantsShop{
 
@@ -32,10 +38,7 @@ class EnchantsShop{
 
 	public function __construct(private EnchantUI $plugin){
 		$this->config = $config = new Config($this->plugin->getDataFolder() . "shop.yml");
-
-		$root = $config->get("shop");
-
-		$this->root = new Category(is_array($root) ? $root : []);
+		$this->root = new Category($config->getAll());
 	}
 
 	public function send(Player $player):void{
@@ -45,7 +48,7 @@ class EnchantsShop{
 	private function getCategoryForm(Player $player, Category $category):MenuForm{
 		$options = [];
 
-		$options[] = $category instanceof SubCategory ? new MenuOption("Go Back") : new MenuOption("Close");
+		$options[] = $category instanceof SubCategory ? new MenuOption("Back") : new MenuOption("Close");
 		$player->hasPermission("eshop.admin") && $options[] = new MenuOption("Edit");
 
 		/** @var SubCategory[] $subCategories */
@@ -77,7 +80,7 @@ class EnchantsShop{
 
 			if($player->hasPermission("eshop.admin")) {
 				if($data === 0) {
-					//todo: admin
+					$player->sendForm($this->editCategoryMenu($category));
 					return;
 				}
 
@@ -161,6 +164,138 @@ class EnchantsShop{
 			$player->sendForm($this->getCategoryForm($player, $parent));
 		});
 	}
+
+	private function editCategoryMenu(Category $category): MenuForm{
+		$options = [
+			new MenuOption("Back"),
+			new MenuOption("Edit Info"),
+			new MenuOption("Add Category"),
+			new MenuOption("Edit Products"),
+		];
+
+		if($category instanceof SubCategory) {
+			$options[] = new MenuOption("Delete");
+		}
+
+		return new MenuForm("Edit ".$category->getInfo()->getName(),"",$options,function(Player $player, int $data) use ($category): void{
+			switch($data){
+				case 0:
+					$player->sendForm($this->getCategoryForm($player, $category));
+					break;
+				case 1:
+					$player->sendForm($this->editInfoForm($category->getInfo(), $this->editCategoryMenu($category)));
+					break;
+				case 2:
+					$subCategory = new SubCategory([], $category);
+
+					$category->getCategories()->addEntry($subCategory);
+					$player->sendForm($this->editCategoryMenu($subCategory));
+					$this->save();
+					break;
+				case 3:
+					/** @var SubCategory $category */ $category->clear();
+
+					$category->getParent()->getCategories()->removeEntry($category);
+					$this->save();
+					break;
+			}
+		});
+	}
+
+	private function editInfoForm(EntryInfo $info, Form $back): CustomForm{
+		return new CustomForm($info->getName(), [
+			new Input("name", "Name", $info->getName(), $info->getName()),
+			new Input("description", "Description", $info->getDescription(), $info->getDescription())], function(Player $player, CustomFormResponse $response) use ($info, $back):void{
+			$name = $response->getString("name");
+			$description = $response->getString("description");
+
+			$info->setName($name);
+			$info->setDescription($description);
+
+			$this->save();
+			$player->sendForm($back);
+		});
+	}
+
+	private function editProducts(Category $category): MenuForm{
+		$options = [
+			new MenuOption("Back")
+		];
+
+		/** @var Product[] $products */
+		$products = $category->getProducts()->getEntries();
+		foreach($products as $product){
+			$options[] = new MenuOption($product->getInfo()->getName());
+		}
+
+		return new MenuForm("Edit Products","",$options,function(Player $player, int $data) use ($category, $products): void{
+			if($data === 0){
+				$player->sendForm($this->editCategoryMenu($category));
+				return;
+			}
+			$data--;
+
+			$product = $products[array_keys($products)[$data]];
+
+			if($category->getProducts()->entryExists($product)){
+				$player->sendForm($this->editProductForm($category, $product));
+				return;
+			}
+
+			$player->sendForm($this->editProducts($category));
+		});
+	}
+
+	private function editProductForm(Category $category, Product $product): MenuForm{
+
+		return new MenuForm("Edit Product", "", [
+			new MenuOption("Back"),
+			new MenuOption("Edit Info"),
+			new MenuOption("Edit MetaData")], function(Player $player, int $data) use ($category, $product):void{
+			switch($data){
+				case 0:
+					$player->sendForm($this->editProducts($category));
+					break;
+				case 1:
+					$player->sendForm($this->editInfoForm($product->getInfo(),$this->editProductForm($category,$product)));
+					break;
+				case 2:
+					$player->sendForm($this->editProductMetaData($category,$product));
+					break;
+			}
+		});
+	}
+
+	private function editProductMetaData(Category $category, Product $product): CustomForm{
+		$states = StringToEnchantmentParser::getInstance()->getAllKnownStates();
+
+		if($product->getEnchantment() !== "") {
+			$enchantment = array_search($product->getEnchantment(), $states, true);
+
+			if(!is_int($enchantment)) {
+				$enchantment = 0;
+			}
+		}else{
+			$enchantment = 0;
+		}
+
+		$providers = array_keys(EconomyManager::getInstance()->getProviders());
+		if($product->getEconomy() !== "") {
+			$provider = array_search(strtolower($product->getEconomy()), $providers, true);
+		}else{
+			$provider = 0;
+		}
+
+		return new CustomForm("Edit Product MetaData", [
+			new Dropdown("enchantment", "Enchantment", $states, $enchantment),
+			new Input("price", "Price", (string) $product->getPrice()),
+			new Dropdown("economy", "Economy", $providers, $provider),
+			new Input("minimum", "Minimum Level", (string) $product->getMinimumLevel()),
+			new Input("maximum", "Maximum Level", (string) $product->getMaximumLevel()),], function(Player $player, CustomFormResponse $response):void{
+
+		});
+	}
+
 
 
 	private function save():void{
